@@ -1,0 +1,94 @@
+\usepackage{makeidx}
+\usepackage{hyperref}
+\usepackage{minted}
+
+% New line per paragraph, instead of indentation
+\usepackage[parfill]{parskip}
+
+% Prevent balancing vertical alignment
+\raggedbottom
+
+% Sets global font
+\usepackage{tgpagella}
+
+% Font utility function
+\newcommand{\fon}[1]{\fontfamily{#1}\selectfont}
+
+\usepackage[table, x11names]{xcolor}
+\definecolor{blue}{RGB}{0, 149, 200}
+\definecolor{green}{RGB}{0, 200, 136}
+
+\captionsetup{justification=raggedright,width=.8\linewidth}
+
+\usepackage[many]{tcolorbox}
+\newtcolorbox{deftbox}{
+    enhanced,
+    sharp corners,
+    frame hidden,
+    boxrule=0em,
+    left=1em,
+    toptitle=1em,
+    top=0.25em,
+    bottom=1em,
+    bottomtitle=0mm,
+    colback=black!4,
+    colbacktitle=black!4,
+    coltitle=black!60,
+    fonttitle=\bfseries\small,
+    fontupper=\small,
+    borderline west={2pt}{0pt}{black!20},
+    grow to left by=-2em,
+    grow to right by=-2em
+}
+\newtcolorbox{defbox}[1]{
+    enhanced,
+    sharp corners,
+    frame hidden,
+    boxrule=0em,
+    left=1em,
+    toptitle=1em,
+    top=0.25em,
+    bottom=1em,
+    bottomtitle=0mm,
+    colback=black!4,
+    colbacktitle=black!4,
+    coltitle=black!60,
+    fonttitle=\bfseries\small,
+    fontupper=\small,
+    borderline west={2pt}{0pt}{black!20},
+    grow to left by=-2em,
+    grow to right by=-2em,
+    title={#1}
+}
+\newtcolorbox{quotebox}{
+    enhanced,
+    sharp corners,
+    frame hidden,
+    left=1em,
+    right=1em,
+    top=1em,
+    bottom=1em,
+    colback=black!4!white,
+    fontupper=\small,
+    grow to left by=-2em,
+    grow to right by=-2em
+}
+
+\def\trim#1{\ignorespaces#1\unskip}
+
+\newcommand{\blockquote}[2]{
+    \hfill
+    \begin{quotebox}
+    \begin{flushleft}
+        ``\trim{#1}''
+        \newline\newline\rightline{\textbf{-- \trim{#2}}}
+    \end{flushleft}
+    \end{quotebox}
+    \noindent
+}
+
+\renewcommand{\listingscaption}{Codevoorbeeld}
+\renewcommand{\listoflistingscaption}{Overzicht van codevoorbeelden}
+\counterwithin{listing}{chapter}
+% \usepackage[chapter]{minted}
+

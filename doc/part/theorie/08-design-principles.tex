@@ -1,0 +1,67 @@
+\chapter{Design principles}
+
+\section{ICE principles}
+
+\subsection{Program to an Interface, not an Implementation}
+
+\blockquote{
+There are two benefits to manipulating objects solely in terms of the interface defined
+by abstract classes:
+\begin{enumerate}
+    \item Clients remain unaware of the specific types of objects they use, 
+    as long as the objects adhere to the interface that clients expect.
+    \item Clients remain unaware of the classes that implement these objects.
+    Clients only know about the (...) [abstraction] defining the interface.
+\end{enumerate}
+\newline\newline
+This so greatly reduces implementation dependencies between subsystems that it leads
+to the following principle ofreusable object-oriented design:
+\newline\newline
+\textit{Program to an interface, not an implementation.}
+}{\cite{Gof1994}, p. 18.}
+
+\subsection{Favor Object Composition over Implementation Inheritance}
+\blockquote{That leads us to our second principle of object-oriented design:
+\newline\newline
+\textit{Favor object composition over class inheritance.}
+\newline\newline
+Ideally, you shouldn't have to create new components to achieve reuse. You should
+be able to get all the functionality you need just by assembling existing components
+through object composition. But this is rarely the case, because the set of available
+componentsis never quite rich enough in practice. Reuseby inheritancemakesit easier
+to make new components that can be composed with old ones. Inheritance and object
+composition thus work together.
+\newline\newline
+Nevertheless, our experience isthat designers overuse inheritance as a reuse technique,
+and designs are often made more reusable (and simpler) by depending more on object composition.}
+{\cite{Gof1994}, p. 20.}
+
+\subsubsection{Encapsulate what varies}
+
+
+\section{SOLID principles}
+
+\subsection{Single Responsibility Principle (SRP)}
+Een manier om de verantwoordelijkheid van een klasse in te richten 
+is door te kijken naar de informatie waar deze over kan beschikken. 
+Breng die dingen samen die dezelfde informatie moeten 
+maken, aanpassen, lezen en verwijderen.
+
+Dit staat ook wel bekend als 
+het \emph{information expert-principe}:
+\blockquote{
+    Assign a responsibility to the information expert---the class 
+    that has the \emph{information} necessary to fulfill the responsibility.
+}{\cite{Larman2004}, p. 248}
+
+In plaats van allemaal lijsten bij te houden van namen en adressen,
+kan je vaak beter een lijst bijhouden met personen, waarin namen en adressen
+zijn opgenomen.
+
+\subsection{Open Closed Principle (OCP)}
+
+\subsection{Liskov Substitution Principle (LSP)}
+
+\subsection{Interface Segregation Principle (ISP)}
+
+\subsection{Dependency Inversion Principle (DIP)}

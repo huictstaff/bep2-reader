@@ -1,0 +1,260 @@
+\documentclass[dutch,a4paper,12pt,doubleside]{book}
+
+\include{config}
+
+\begin{document}
+
+\setcounter{chapter}{2}
+\chapter{Opdracht 3: Application service}
+We hebben het project aan de praat, de eisen geanalyseerd, 
+de use cases gemodelleerd en de eerste domeinconcepten gerealiseerd. 
+Het doet allemaal alleen nog niet zoveel!
+
+We gaan nu bezig met de kern van onze applicatie:
+use cases en domeinacties. Deze opdracht duurt waarschijnlijk het langst!
+Het is niet erg om te beginnen aan deze opdracht en hem later te
+verbeteren wanneer we de controller en de repository werkend hebben.
+
+\section{Spring Boot}
+Spring Boot is een veelgebruikte standaardconfiguratie van het Spring framework.
+
+\subsection{Frameworks}
+Een \textit{framework} is code van anderen die je een hoop werk uit handen 
+nemen ten aanzien van een of meer functionaliteiten. Het is een concrete, herbruikbare standaardoplossing.
+Kenmerkend aan een framework is dat je als developer een deel van de controle 
+uit handen geeft. Er is sprake van \textit{inversion of control}: het framework 
+roept onze code aan op bepaalde plekken. Interactie met het framework vindt op twee plaatsen 
+plaats:
+\begin{enumerate}
+    \item Entry points: hier roepen we het framework aan
+    \item Hot spots: hier haken we onze eigen code in het framework en roept het framework onze code aan
+\end{enumerate}
+
+Er zijn twee soorten hot spots, die je kan herkennen vanuit het objectmodel:
+\begin{enumerate}
+    \item Composition hot spots: integratie van het aan een interface meegeven 
+    van implementerende dependencies
+    \item Inheritance hot spots: integratie via het overerven 
+    van een vooropgezette klassenstructuur
+\end{enumerate}
+
+Beide vormen komen vaak voor in een framework.
+
+In Spring herkennen we de \texttt{CasinoApplication} als entry point.
+Deze is geannoteerd met \texttt{@SpringBootApplication}. Vervolgens laadt
+Spring allerlei configuratie in, voert het een componentscan uit en klikt het dependencies in elkaar.
+Spring's dependency injection is één van de composition hot spots die te vinden zijn in Spring,
+terwijl Spring's repositories een vorm zijn inheritance hot spots.
+
+\subsection{Dependency injection}
+Dependency injection is niets anders dan het meegeven van afhankelijkheden,
+in plaats van ze binnen de klasse aan te maken. Dit zorgt ervoor dat een klasse 
+makkelijker uitbreidbaar en testbaar is. Hierover in een latere cursus meer.
+
+In Spring maken we services aan door de klasse te annoteren met de \texttt{@Service} annotatie. 
+We kunnen met dependency injection werken door de services (en opslagmechanismen) waarvan we afhankelijk zijn 
+aan te geven in de constructor. Spring vindt dan automatisch welke services we bedoelen. 
+Dit heet \textit{autowiring}.
+Spring gaat tijdens een opstarten van de applicatie door onze code op zoek naar 
+\texttt{@Bean}, \texttt{@Component}, \texttt{@Service}. Dit noem je Beans. 
+Spring kijkt voor de dependencies naar de constructor en de benodigde interfaces 
+en kijkt of er Beans zijn geconfigureerd die aan die interface voldoen. Met autowiring 
+injecteert Spring de benodigde afhankelijkheid dus automatisch!
+
+Kijk voor een voorbeeld wederom in het Chips-component.
+
+Als alternatief voor constructor-injection kan 
+je ook werken met de \texttt{@Autowired} annotatie 
+op setters, constructor parameters of properties. 
+
+Als we meerdere implementaties hebben van dezelfde interface 
+(bijvoorbeeld omdat we een testimplementatie hebben), 
+dan moeten we specifiek aangeven welke service we willen gebruiken. 
+Dat kunnen we doen met de \texttt{@Qualifier} annotatie op zowel de service als binnen de constructor. 
+Daarmee kwalificeren we om welke implementatieklasse het gaat door 
+dit aan te geven boven elke \texttt{@Service} en vóór elke parameter in de 
+constructor die de service gebruikt.
+
+Met \texttt{@Value} kan je aangeven dat een waarde moet worden geïnjecteerd,
+afkomstig is uit configuratie.
+
+\section{Libraries}
+Een library is ook een voorbeeld van een concrete, herbruikbare standaardoplossing.
+Het belangrijkste verschil tussen een library en een framework is dat 
+een framework veel meer controle opeist. Een library wordt door onze code aangeroepen
+terwijl een framework uiteindelijk onze code aanroept (inversion of control).
+
+Wel zie je vaak dat een framework gebruik maakt of zich openstelt voor verschillende
+libraries door middel van composition hot spots. Vaak heb je dan een adapter nodig 
+om de interface van het framework aan te passen aan de geboden facade van de library.
+Dit zijn voorbeelden van design patterns. Hier gaan we het later uitgebreid over hebben.
+
+\section{Stap 1: Maak een applicatieservice}
+In ons domein hebben we een aantal domeinklassen gemaakt die verantwoordelijk 
+zullen worden voor kleine acties per concept. Deze worden aan elkaar geknoopt 
+door een dienstverlenend object dat verantwoordelijk is voor het omzetten van 
+use cases naar domeinacties met behulp van infrastructuur. 
+Dat wordt ook wel een \textit{application service} genoemd.
+
+Maak eerst weer een package aan onder onze blackjack-component met de naam \texttt{application}
+Dit is de applicatielaag waarin we onze taakgerichte logica (use cases) gaan uitvoeren.
+Maak in die package een klasse aan: \texttt{BlackjackService}.
+Het is immers een dienst die de acties aanbiedt om blackjack te kunnen spelen!
+Deze wordt uiteindelijk aangesproken door de controller.
+
+Vervolgens moeten we aan Spring doorgeven dat hij deze service kan gebruiken 
+om te meegeven aan een andere service of bijvoorbeeld een controller als deze 
+deze nodig heeft in de controller. Spring bevat een automatisch mechanisme 
+voor \textit{dependency injection} en gebruikt daar annotaties voor. Om de service 
+als zodanig vindbaar te maken, kan je \texttt{@Service} boven de klassedeclaratie plaatsen.
+
+Dit zou er als volgt uit moeten zien:
+\begin{minted}{java}
+package nl.hu.bep2.casino.blackjack.application;
+
+@Service
+public class BlackjackService {
+}
+\end{minted}
+
+\section{Stap 2: Bedenk welke methodes we nodig hebben}
+Welke acties moet onze service aanbieden? 
+Dit komt overeen met de use cases van onze component! 
+Als het goed is, hebben we hiervoor een use case diagram gemaakt.
+
+Maak public methods aan met de namen van deze use cases volgens 
+de naming conventions van Java (\textit{camelCase}). 
+Bedenk per methode ook wat voor een input we nodig hebben.
+Voor sommige methoden is het handig om het spel te kunnen identificeren
+op basis van een id (type: \textit{Long}). Voor de meeste methoden hebben 
+we daarnaast de naam van de gebruiker nodig (type: \textit{String}).
+
+De identifier zullen we automatisch door de database laten genereren
+zodra we met persistentie bezig gaan.
+
+\subsection{Voorbeeld: Het starten van het spel}
+Laten we als voorbeeld het starten van een spel als use case nemen.
+Het is belangrijk om hier een duidelijke, beschrijvende naam voor te pakken,
+bijvoorbeeld: \textit{startGame} of \textit{start}.
+
+\subsubsection{Method arguments}
+Wat moeten we allemaal meegeven als parameters om het spel te starten?
+
+Om het spel te kunnen opzoeken voor deze speler is het handig om de naam van de speler  
+te bewaren. We kunnen een parameter toevoegen met als type \texttt{String} en 
+als naam \texttt{playerName}. 
+Omdat een speler meerdere spellen kan hebben, moeten we ervoor zorgen 
+dat de database ook elk spel voorziet van een unieke identifier. 
+Dat doen we later wanneer we met persistentie bezig gaan.
+
+Het is handig om het spel meteen te beginnen met een inleg. Dat bespaart ons een
+extra HTTP request! Laten we de parameter \texttt{Integer bet} toevoegen.
+
+Meer hebben we niet nodig van de speler!
+
+\subsubsection{Return type}
+Wat willen we teruggeven nadat we het spel hebben gestart? 
+Hier kunnen we wat slims verzinnen om aan de speler te laten zien hoe 
+het spel er nu uitziet: de spelvoortgang. 
+We willen uiteindelijk namelijk in de controller
+een bericht terugsturen naar de HTTP client met daarin een JSON body 
+met alle informatie. Een front-endprogrammeur kan dat mooi weergeven met
+afbeeldingen en interacties.
+
+Welke informatie willen we aan de speler laten zien
+en hoe kunnen we dat het best structureren? Dat laten we aan jou over!
+Alvast een tip: we kunnen een String teruggeven, 
+maar dan gaat er een boel gestructureerde informatie verloren!
+
+\subsection{Stap 3: Vul de methodes in}
+Nadat we bedacht hebben welke methodes onze service moet hebben, 
+kunnen we naar de invulling van die methodes kijken.
+Het is het mooiste als applicatieservices niet teveel logica bevatten,
+maar het gros van het werk door domeinobjecten wordt gedaan.
+Op deze manier houd je een abstract en herbruikbaar domein en is je 
+applicatieservice een soort samenvatting van hoe het domein zich gedraagt.
+
+Probeer in algemene bewoordingen de acties te beschrijven 
+en gaandeweg acties toe te voegen aan de centrale domeinentiteit
+en de domeinobjecten die daarin gebruikt worden.
+
+\subsubsection{Voorbeeld: Method body van startGame}
+We hebben een methodenaam, parameters en een return type gedeclareerd.
+Welke stappen willen we uitvoeren in de methode? 
+
+Globaal zal je op de volgende zaken uitkomen:
+
+\begin{enumerate}
+    \item Neem het aantal chips op ter hoogte van de bet
+    \item Maak een nieuw spel aan
+    \item Start het spel
+    \item Sla het spel op
+    \item Stort chips als sprake van blackjack of push
+    \item Geef de voortgang terug
+\end{enumerate}
+
+Voor het starten van het spel kan je een methode op het Game object maken,
+genaamd \textit{start}. Je kan ervoor kiezen om de benodigde parameters mee te geven aan de 
+constructor of de start methode. Wat deze methode moet doen laten we aan jou over.
+Een aantal tips: wat moet de speltoestand zijn bij het beginnen van het spel?
+Laat je het spel zelf een nieuwe Deck maken of doen we dat in de application service?
+
+Bij de uitvoering van \textit{game.start()}, maken we onder andere gebruik van 
+Deck en vast ook wel van andere klassen en enums! 
+De kaarten moeten worden geschud en op de hand worden gebracht van de speler 
+en van de dealer. Vervolgens moeten scores berekend worden en de huidige speltoestand 
+geupdatet worden.
+
+Het opslaan van het spel kan je nog even laten zitten,
+maar het is misschien handiger om dit tijdelijk te doen 
+door een field op te nemen in de application service.
+Je zou hiervoor een \texttt{Map<String, Game>} kunnen gebruiken 
+waarmee tijdelijk spellen (\textit{value}) bewaard kunnen worden 
+op basis van spelernaam (\textit{key}).
+
+Dit gaan we in een van de volgende opdrachten vervangen met apart object dat verantwoordelijk 
+is voor de langdurige opslag van spellen: een GameRepository.
+
+\subsubsection{Bescherm in domeinacties tegen ongeldige situaties (invariants)}
+Je domein bepaalt hoe de regels van de kernconcepten eruit zien.
+Bij een spel zijn het bijvoorbeeld letterlijk de spelregels.
+Zie bijvoorbeeld de Chips-klasse: je mag geen negatieve hoeveelheid opnemen 
+en je mag geen chips opnemen als je saldo te laag is.
+
+\begin{minted}{java}
+ public void withdraw(Long amountToWithdraw) {
+    if (amountToWithdraw < 0) {
+        throw new NegativeNumberException("Cannot withdraw a negative amount: " + amountToWithdraw);
+    }
+
+    long newAmount = this.amount - amountToWithdraw;
+    if (newAmount < 0) {
+        throw new NotEnoughChipsException(
+                String.format(
+                        "Cannot withdraw %d chips: %d chips remaining",
+                        amountToWithdraw,
+                        this.amount
+                )
+        );
+    }
+
+    this.amount = newAmount;
+}    
+\end{minted}
+
+Voor het spelen van het spel geldt hetzelfde. Je mag natuurlijk 
+geen zetten doen als het spel is afgelopen! Hiervoor kan je een \textit{guard-clause} gebruiken:
+een \textit{if-statement} die een exception gooit als iets niet mag. Je hebt geen \textit{else} nodig! 
+De flow wordt immers doorbroken als er sprake is van een exception.
+
+\subsubsection{Overige use cases en domeinacties}
+Doe hetzelfde voor de overige use cases en domeinacties. 
+Hier gaat een boel tijd inzitten, 
+dus het is niet erg als je dit later verbetert wanneer we 
+de persistentie en de web API ingericht hebben.
+
+Commit je wijzigingen met een duidelijke naam, 
+bijvoorbeeld: "Add use cases to blackjack service". 
+Push de wijzigingen naar je remote GitHub repository.
+
+\end{document}

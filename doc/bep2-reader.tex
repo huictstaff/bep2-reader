@@ -1,0 +1,68 @@
+\documentclass[dutch,a4paper,12pt,doubleside]{book}
+
+\usepackage[T1]{fontenc}
+\usepackage[dutch]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=3cm]{geometry}
+\usepackage{amsthm}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{float}
+\usepackage{trimspaces}
+\usepackage[nottoc]{tocbibind}
+\usepackage[labelfont=bf]{caption}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{dirtree}
+
+% Card suits
+\DeclareSymbolFont{extraup}{U}{zavm}{m}{n}
+\DeclareMathSymbol{\varheart}{\mathalpha}{extraup}{86}
+\DeclareMathSymbol{\vardiamond}{\mathalpha}{extraup}{87}
+
+% Bibliography
+\usepackage{natbib}
+\bibliographystyle{apa}
+
+\include{styling}
+\graphicspath{ {./img/} }
+
+\renewcommand\indexname{Trefwoorden}
+\makeindex
+
+\hypersetup{
+  colorlinks,
+  allcolors=[rgb]{0.3,0.3,0.8},
+  linktoc=all
+}
+
+
+\begin{document}
+
+{\hypersetup{linkcolor=black}
+\tableofcontents
+}
+
+
+\part{De cursus}
+\input{part/cursus/cursusopzet}
+
+\part{De theorie}
+\input{part/theorie/00-structurele-kwaliteit}
+\input{part/theorie/01-programmeren-met-java}
+\input{part/theorie/02-object-orientatie}
+\input{part/theorie/03-softwarearchitectuur}
+
+\part{De opdracht}
+\input{materials/00-opdrachtbeschrijving}
+\input{materials/01-projectopzet-en-analyse}
+\input{materials/02-use-cases-en-domeinmodel}
+\input{materials/03-application-service}
+\input{materials/04-web-api}
+\input{materials/05-persistentie}
+\input{materials/06-principles-en-patterns}
+
+% \printindex
+\bibliography{sources}
+
+\end{document}
