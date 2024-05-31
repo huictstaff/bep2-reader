@@ -1,31 +1,6 @@
 \documentclass[dutch,a4paper,12pt,doubleside]{book}
 
-\usepackage[T1]{fontenc}
-\usepackage[dutch]{babel}
-\usepackage[utf8]{inputenc}
-\usepackage[margin=3cm]{geometry}
-\usepackage{amsthm}
-\usepackage{hyperref}
-\usepackage{minted}
-\usepackage{float}
-\usepackage{trimspaces}
-\usepackage[nottoc]{tocbibind}
-\usepackage[labelfont=bf]{caption}
-\usepackage{tabularx}
-\usepackage{array}
-\usepackage{dirtree}
-
-% Card suits
-\DeclareSymbolFont{extraup}{U}{zavm}{m}{n}
-\DeclareMathSymbol{\varheart}{\mathalpha}{extraup}{86}
-\DeclareMathSymbol{\vardiamond}{\mathalpha}{extraup}{87}
-
-% Bibliography
-\usepackage{natbib}
-\bibliographystyle{apa}
-
-\include{styling}
-\graphicspath{ {./img/} }
+\input{config}
 
 \renewcommand\indexname{Trefwoorden}
 \makeindex
