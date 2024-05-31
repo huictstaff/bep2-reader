@@ -1,4 +1,5 @@
 \chapter{Opdrachtbeschrijving}
+
 De eindopdracht van deze cursus bestaat uit een Java-project met een mondeling assessment.
 
 HU-land Casino is een aanbieder van online kansspelen. 
@@ -39,6 +40,10 @@ De speler probeert de dealer te verslaan door met de score van de kaarten
 in de hand dichter bij de 21 te komen dan de dealer, 
 zonder boven de 21 uit te komen.
 
+In onze variant is er sprake van 1-speler-blackjack. Er kunnen wel 
+meerdere potjes tegelijk gespeeld worden door verschillende en dezelfde 
+speler. Spelers mogen niet aan elkaars spel meedoen.
+
 \subsection{Het spelverloop}
 Laten we het spelverloop van blackjack bestuderen.
 Let wel: voor een web-applicatie kan het zijn dat sommige stappen
@@ -72,15 +77,17 @@ Het algemene spelverloop is als volgt:
         \end{itemize}
 \end{enumerate}
 
-Het spelverloop is in kaart gebracht in Figuur~\ref{fig:conceptual-flow-blackjack}.
+% Het spelverloop is in kaart gebracht in Figuur~\ref{fig:conceptual-flow-blackjack}.
+% Let op dat dit in onze applicatie opgebroken moet worden in use cases en dat dit 
+% gevolgen heeft voor hoe onze web API eruit komt te zien.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{conceptual-flow-blackjack}
-    \caption{Conceptuele flowchart voor blackjack. 
-    Binnen een web-applicatie zal het er anders uitzien in verband met technische keuzes, efficiëntie en onderhoudbaarheid.}
-    \label{fig:conceptual-flow-blackjack}
-\end{figure}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=\linewidth]{conceptual-flow-blackjack}
+%     \caption{Conceptuele flowchart voor blackjack. 
+%     Binnen een web-applicatie zal het er anders uitzien in verband met technische keuzes, efficiëntie en onderhoudbaarheid.}
+%     \label{fig:conceptual-flow-blackjack}
+% \end{figure}
 
 \subsection{Kaart- en handscore}
 Per kaart wordt de score bepaald op basis van de rang (\textit{rank}) van de kaart:
@@ -91,7 +98,8 @@ Per kaart wordt de score bepaald op basis van de rang (\textit{rank}) van de kaa
     \item \textbf{Aas (Ace): 1 of 11}
 \end{itemize}
 
-De handscore wordt bepaald door deze scores bij elkaar op te tellen, zie Tabel~\ref{table:handscores}.
+De handscore wordt bepaald door deze scores bij elkaar op te tellen, 
+zie Tabel~\ref{table:handscores}.
 
 \begin{table}[H]
     \centering
@@ -115,7 +123,9 @@ met de hogere aas-score uit te komen of te hopen op betere kaarten
 met de lagere aas-score. Als de hogere aas-score boven de 21 uitkomt,
 hoeven we alleen nog maar te kijken naar de lagere aas-score.
 
-\subsection{Speltoestanden en uitbetaling}
+\newpage
+
+\subsection{Speltoestanden}
 Er zijn een aantal toestanden waar het spel zich in kan bevinden:
 \begin{itemize}
     \item \textit{Waiting}: het spel is aangemaakt, maar nog niet gestart (optioneel)
@@ -128,7 +138,10 @@ Er zijn een aantal toestanden waar het spel zich in kan bevinden:
     \item \textit{Won}: speler heeft een hogere handscore dan de dealer of de dealer heeft >21
 \end{itemize}
 
-Het uitbetalen van chips is gebaseerd op de eindtoestand (rond af naar hele chips):
+\subsection{Uitbetaling}
+Het uitbetalen van chips is gebaseerd op de eindtoestand (rond af naar hele chips).
+Het spel eindigt alleen bij de volgende speltoestanden:
+
 \begin{itemize}
     \item \textit{Bust}: speler krijgt niets terug
     \item \textit{Lost}: speler krijgt niets terug

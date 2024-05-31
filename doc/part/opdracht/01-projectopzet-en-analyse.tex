@@ -13,7 +13,8 @@ Ook is er een wrapper (mvnw) opgenomen in het project mocht je de commandline wi
 Clone het GitHub-project via de link die op Canvas wordt aangeboden.
 We gebruik hiervoor private repositories binnen GitHub Education.
 Zorg dat je een clone krijgt binnen GitHub om je werk in te leveren 
-en op je machine om te werken.
+en op je machine om te werken. Open de root-directory van het project
+via IntelliJ.
 
 \subsection{Starten met Docker}
 Heb je het project op je machine staan? Open het in je IDE (bij voorkeur IntelliJ).
@@ -158,7 +159,8 @@ om er meer over te weten te komen.
 
 Twee veelvoorkomende fouten:
 \begin{itemize}
-    \item De database is onbereikbaar: zorg dat je bovenstaande instructies hebt gevolgd.
+    \item De database is onbereikbaar: zorg dat je bovenstaande instructies hebt gevolgd om de database (met of zonder Docker)
+    draaiende te krijgen.
     \item De poort 8080 is al in gebruik: er draait al een web-applicatie op poort 8080. 
     Sluit deze applicatie af of stel een andere poort in in de application.properties.
 \end{itemize}
@@ -200,7 +202,7 @@ gaan toevoegen om Blackjack te kunnen spelen!
 Laten we een nieuwe gebruiker aanmaken, de inloggen, zijn chips bekijken en nieuwe chips storten.
 \begin{enumerate}
     \item \textbf{auth, POST register}: registreer een gebruiker.
-    Je kan de waarden aanpassen door naar "Body" te gaan.
+    Je kan de waarden aanpassen door naar "Body" te gaan als je wilt.
     \item \textbf{auth, POST login}: login als de gebruiker die je zojuist
     hebt aangemaakt. Pas de waarden aan in de request body indien nodig.
     \item \textbf{chips, GET show balance}: laat de chips zien van de huidige 
@@ -214,7 +216,7 @@ Lukt er iets niet? Kijk of je de fout kunt achterhalen door
 naar de logs te kijken in je IDE. Bespreek het met medestudenten 
 en docenten als je er niet uit komt of iets niet begrijpt.
 
-Heb je iets veranderd en werkt het? Sla je werk op. 
+Heb je iets veranderd om het werkend te krijgen? Sla je werk op. 
 Commit je wijzigingen met een duidelijke naam, 
 bijvoorbeeld: "Improve URLs in Postman collection". 
 Push de wijzigingen naar je remote GitHub repository.
@@ -245,6 +247,8 @@ In het verleden is gebleken dat veel studenten erg laat beginnen
 en daarmee in de knoop komen met andere cursussen. Probeer dat te 
 voorkomen door regelmatig je werk in te leveren, zodat je continu feedback 
 kunt krijgen. Het is dus handig om voor jezelf een planning te maken.
+De opdracht is om die reden opgedeeld in 6 stappen die ongeveer gelijk lopen 
+met de inhoudelijke invulling van de werkcolleges.
 Maak je je op enig punt tijdens de cursus zorgen over de planning,
 geef het aan!
 
@@ -266,15 +270,6 @@ van een softwareproject. Een softwareproject heeft in algemene zin
 een goede structuur als deze is opgedeeld in kleine,
 opzichzelf staande modules die intern veel samenhang 
 en met elkaar beperkt koppeling vertonen.
-
-Met andere woorden, we willen modulariteit dankzij:
-\begin{enumerate}
-    \item Separation of concerns
-    \item High cohesion
-    \item Loose coupling
-\end{enumerate}
-
-Zie: \cite{YourdonConstantine1979}, \cite{Dijkstra1982} en \cite{ISO25010}.
 
 \newpage
 \subsubsection{Packagestructuur in Java}
@@ -396,14 +391,20 @@ maar misschien wil je hier al wat meer over weten.
 De datalaag bestaat weliswaar slechts uit interfaces die door 
 Spring geïmplementeerd worden, maar ze zijn afhankelijk van objecten (entiteiten) die
 gedefinieerd zijn in het domein. Logisch gezien zou je het project daarom 
-eerder beschouwen als een drie-lagen-architectuur! De laatste laag zou dan zowel
-domeinlogica als infrastructuurabstracties bevatten. De laatste laag is opgedeeld 
-in twee Java packages om de abstracte kern te scheiden van concrete 
-aansluiting met infrastructuur. Het casino-project kent verder 
-een relaxed layered architecture: je mag lagen overslaan.
+eerder beschouwen als een drie-lagen-architectuur! De laatste laag zou dan 
+conceptueel zowel domeinlogica als infrastructuurabstracties bevatten. 
+Deze laag is dan fysiek (in onze code) opgedeeld in twee Java packages 
+om de abstracte, stabiele kern (domein) te scheiden van de meer flexibele 
+aansluiting met infrastructuur via interfaces (data). 
+Het casino-project kent verder een flexible layered architecture: 
+je mag lagen overslaan.
 Zo mag je in de presentatielaag een domeinobject teruggeven,
 zodat het in een HTTP-response kan worden opgenomen, en exceptions uit het domein 
 afhandelen zodat een HTTP-response de juiste statuscode kan hebben.
+Dit is in veel gelaagde architecturen niet het geval. In die architecturen 
+heeft een laag alleen koppeling met de laag rechtstreeks eronder.
+In ons project is dit niet nodig. Het scheelt een hoop extra code en we 
+tolereren de extra koppeling.
 
 \begin{figure}[H]
     \centering
@@ -412,13 +413,13 @@ afhandelen zodat een HTTP-response de juiste statuscode kan hebben.
     \label{fig:casino-layers}
 \end{figure}
 
-Als je de realisatie meer wil afstemmen op de laging, zou je de 
+Als je de realisatie toch meer wil afstemmen op de laging, zou je de 
 data-objecten en domein-objecten van elkaar splitsen en deze als losse objecten opnemen in de datalaag.
 Daarvoor moet je dan daartussen een vertaalslag aanbieden. 
 Als je daarnaast wil verbieden dat er lagen worden overgeslagen, 
 zou je ook een vertaalslag kunnen toevoegen tussen domeinobjecten en presentatie-objecten.
 Als alternatief zou je de infrastructuur-abstractie
-(de repository) kunnen opnemen in het domein en dat \textit{data} package verwijderen.
+(de repositories) kunnen opnemen in het domein en dat \textit{data} package verwijderen.
 In ons project passen we deze regels echter niet zo strikt toe:
 we accepteren een lichte koppeling op het framework en op ons domein.
 
@@ -434,7 +435,7 @@ dat eruit zoals in Figuur~\ref{fig:chips-layers}.
     \centering
     \includegraphics[width=0.8\linewidth]{chips-layers}
     \caption{De semi-gelaagde structuur binnen het chips-component.}
-    \label{fig:chips-use-cases}
+    \label{fig:chips-layers}
 \end{figure}
 
 Probeer voor jezelf de volgende vragen te beantwoorden, eventueel door naar de code te kijken.

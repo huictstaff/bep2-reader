@@ -2,7 +2,7 @@
 Onze applicatie presenteert zichzelf naar buiten toe via het web:
 we reageren op HTTP requests en geven HTTP responses terug.
 
-\subsection{Client/server-architectuur}
+\section{Client/server-architectuur}
 Het web werkt volgens een client/server-architectuur (of klant/bediende-model):
 We hebben een client, bijvoorbeeld een web browser, die een verzoek doet 
 aan een server die dit afhandelt. Zie Figuur~\ref{fig:client-server}.
@@ -14,7 +14,7 @@ aan een server die dit afhandelt. Zie Figuur~\ref{fig:client-server}.
     \label{fig:client-server}
 \end{figure}
 
-\subsection{Content negotiation}
+\section{Content negotiation}
 Zoals in Figuur~\ref{fig:client-server} is te zien, 
 onderhandelen client en server over het ophalen van een \textit{representatie}
 van een bepaalde \textit{resource}. We zien dat de client een 
@@ -26,7 +26,7 @@ De gewenste representatie daarvan moet `application/json' zijn.
 Deze interactie tussen client en server noem je \texit{content negotation}:
 er is een scheiding tussen de abstractie en de verschijningsvorm ervan.
 
-\subsection{HTTP requests}
+\section{HTTP requests}
 Een HTTP request (zie Figuur~\ref{fig:client-server}) wordt gevormd door:
 \begin{enumerate}
     \item Een beschrijving van method, URI en protocol
@@ -34,7 +34,7 @@ Een HTTP request (zie Figuur~\ref{fig:client-server}) wordt gevormd door:
     \item Optioneel: een request body met een representatie volgens Content-Type
 \end{enumerate}
 
-\subsubsection{HTTP methods}
+\subsection{HTTP methods}
 De HTTP-specificatie beschrijft een aantal methodes 
 waarmee een client allerlei zaken kan vragen aan een server.
 Het is belangrijk om de juiste HTTP-methodes te gebruiken omdat 
@@ -65,9 +65,11 @@ We kennen de volgende HTTP-methods, zie Figuur~\ref{table:http-methods}:
 
 \begin{table}[H]
 \centering
-\begin{tabularx}{\textwidth}{|>{\raggedright}l|>{\raggedright}l|>{\raggedright\arraybackslash}X|}
+\begin{tabularx}{\textwidth}{
+    |>{\raggedright}l|>{\raggedright}X|>{\raggedright}X|>{\raggedright\arraybackslash}X|
+}
 \hline
-\textbf{HTTP-method} & \textbf{Bedoeling} & \textbf{Safe} & \textbf{Idempotent} \\ \hline
+\textbf{Method} & \textbf{Bedoeling} & \textbf{Safe} & \textbf{Idempotent} \\ \hline
 \texttt{GET} & opvragen van resource(s) & Ja & Ja \\ \hline
 \texttt{HEAD} & opvragen van headers (voordat je een mogelijk grote GET-request doet) & Ja & Ja \\ \hline
 \texttt{OPTIONS} & opvragen van toegestane communicatiewijzen voor een bepaalde URL of server & Ja & Ja \\ \hline
@@ -82,7 +84,8 @@ We kennen de volgende HTTP-methods, zie Figuur~\ref{table:http-methods}:
 \centering
 \end{table}
 
-\subsection{HTTP responses}
+\newpage
+\section{HTTP responses}
 Een HTTP response (zie Figuur~\ref{fig:client-server}) wordt gevormd door:
 \begin{enumerate}
     \item Een beschrijving van protocol en statuscode
@@ -90,7 +93,7 @@ Een HTTP response (zie Figuur~\ref{fig:client-server}) wordt gevormd door:
     \item Optioneel: response body met een representatie volgens Content-Type 
 \end{enumerate}
 
-\subsubsection{Status codes}
+\subsection{Status codes}
 Het teruggeven van de juiste statuscode is erg belangrijk wanneer je een API 
 ontwerpt. Het maakt een bepaalde verwachting duidelijk en clients krijgen zo 
 de mogelijkheid om slim om te gaan als er bijvoorbeeld een redirection moet plaatsvinden
@@ -139,14 +142,14 @@ Deze statuscodes zijn als enum opgenomen in Spring, te vinden in
 Standaard geeft Spring een \texttt{200 OK} terug als het een object in de controller teruggeeft
 en een \texttt{500 Server Error} als er iets fout gaat bij de verwerking.
 
-\subsection{Representational State Transfer (REST)}
+\section{Representational State Transfer (REST)}
 \textit{Representational State Transfer (REST)} is een architecturele stijl,
 een set aan afspraken om een aantal problemen van het vroege web op te lossen.
 Het is een standaard die door de meeste webapplicaties,
 bewust of onbewust, wordt toegepast.
 
 Deze eigenschappen en aanbevelingen zijn beschreven in de baanbrekende 
-PhD-thesis van Roy Fielding: \ref{Fielding2000}.
+PhD-thesis van Roy Fielding.
 
 Er zijn een aantal eigenschappen waar REST een oplossing voor wil 
 bieden:
@@ -160,13 +163,13 @@ bieden:
     \item betrouwbaarheid bij foutafhandeling binnen en tussen componenten
 \end{itemize}
 
-Dit heeft geleid tot zes architecturele \textit{constraints} (beperkingen):
+Deze eisen hebben geleid tot zes architecturele \textit{constraints} (beperkingen):
 
-\subsubsection{1. Client/server}
+\subsection{Client/server}
 Een scheiding van client en server leidt tot \textit{separation of concerns} en 
 zorgt voor portabiliteit. Een server kan verschillende soorten clients bedienen.
 
-\subsubsection{2. Stateless communicatie}
+\subsection{Stateless communicatie}
 Client-servercommunicatie moet stateless zijn. 
 Dat betekent dat alle benodigde informatie om het request af te handelen in het request (url, headers, body) moet zijn opgenomen.
 
@@ -192,7 +195,7 @@ Wij sturen dan ook steeds de session state
 mee in de JWT-token in de Authorization header.
 De Postman-collectie zorgt ervoor dat dit automatisch gebeurt.
 
-\subsubsection{3. Cacheability}
+\subsection{Cacheability}
 Om de netwerk-efficiëntie nog meer te vergroten, moeten we slim 
 omgaan met caching. Een \textit{cache} zorgt ervoor dat we niet 
 het verzoek nogmaal in zijn volledigheid hoeven te verwerken,
@@ -204,7 +207,7 @@ zijn er op het gebied van HTTP en REST een aantal afspraken ten
 aanzien van het soort \textit{request methods} die veilig zijn 
 om te gebruiken of niet.
 
-\subsubsection{4. Uniform interface}
+\subsection{Uniform interface}
 We kennen het ontwerpprincipe dat we willen programmeren tegen 
 standaardabstracties (\textit{program to an interface}), zodat 
 de onderliggende implementatie kan variëren. Om een gestandaardiseerde 
@@ -227,7 +230,7 @@ In het ideale geval zit alle informatie in de response ingebakken,
 ook welke acties nog meer mogelijk zijn met de betreffende resource.
 Dat is wat HATEOAS inhoudt.
 
-\subsubsection{5. Layered system}
+\subsection{Layered system}
 Clients zouden alleen maar weet moeten hebben van één server 
 om een bepaalde resource op te vragen of te bewerken. Dat er 
 op de achtergrond allerlei andere systemen spelen zou niet relevant 
@@ -240,7 +243,7 @@ hoeft hier (wat de API betreft) weinig van te merken.
 Dit is \textit{high cohesion} 
 en \textit{loose coupling} op HTTP niveau!
 
-\subsubsection{6. Code-on-demand (optional)}
+\subsection{Code-on-demand (optional)}
 Binnen REST kunnen we de mogelijkheid aan servers bieden om gedrag 
 op de client uit te breiden. Het eerste verzoek aan een server geeft 
 meestal een hele set aan JavaScript terug om zo de gebruikerservaring 
@@ -248,25 +251,25 @@ te verrijken!
 
 Een RESTful systeem moet zo zijn opgezet dat dit mogelijk is.
 
-\subsubsection{RESTful of niet?}
+\subsection{RESTful of niet?}
 Striktgenomen noemen we een web service RESTful als deze voldoet aan 
 alle principes van REST. In de praktijk is dat helaas niet het geval
 en worden veel web APIs RESTful genoemd zonder dat aan alle voorwaarden 
 wordt voldaan.
 
-\section{Stap 1: Ontwerp de web API op basis van HTTP/REST}
+\section{Stap 1: Ontwerp de web API op basis van REST}
 Als we volgens REST met HTTP willen werken, bieden we meestal per resource een endpoint aan. 
 REST is een gestandaardiseerde manier van werken. 
 Het is de moeite waard om te kijken of we dit op de juiste manier implementeren. 
 Niet alleen omdat we erop beoordeeld worden, maar ook omdat men in de praktijk bepaalde verwachtingen heeft van een REST API.
 
 We moeten in het kader van de uniform interface rekening houden met:
-\begin{enumeration}
+\begin{enumerate}
     \item De juiste URL-structuur
     \item De juiste HTTP-request methods en headers
     \item De juiste parameters in URL, query en body
     \item De juiste HTTP-response codes, headers en body
-\end{enumeration}
+\end{enumerate}
 
 Via content negotiation wordt binnen REST een representation 
 aangeboden van de resource, zoals bijvoorbeeld JSON of XML. 
@@ -464,7 +467,7 @@ Waarschijnlijk niet van toepsing op ons project,
 maar je kan in een URL ook query parameters toevoegen.
 Dit ziet er vaak uit als een reeks keys en values achter een vraagteken,
 vaak om een bepaalde verzameling aan resultaten te filteren of ordenen:
-\texttt{GET /search?q=cohesion&src=typed_query} met als host \textit{twitter.com} 
+\texttt{GET /search?q=cohesion\&src=typed\_query} met als host \textit{twitter.com} 
 toont de tweets die voldoen aan de zoekquery ``cohesion''.
 
 We kunnen een dergelijke variabele inzetten op dezelfde manier als we doen voor 
@@ -497,4 +500,4 @@ Zie hiervoor ook de ChipsController.
 
 Wil je een slimmere manier om foutafhandeling te regelen? Dan kan je 
 kijken naar \texttt{@ControllerAdvice} of \texttt{@ExceptionHandler}.
-Google is your friend.
+\textit{Google is your friend!}

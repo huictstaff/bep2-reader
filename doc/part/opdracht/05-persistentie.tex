@@ -1,5 +1,5 @@
 \chapter{Opdracht 5: Persistentie}
-Het Engelse \texttt{to persist} betekent \texttt{volharden} 
+Het Engelse \textit{to persist} betekent \textit{volharden} 
 en dat is precies wat persistentie inhoudt:
 de opslag overleeft het afsluiten van de applicatie.
 Het gaat dus langer mee dan het werkgeheugen, bijvoorbeeld 
@@ -24,6 +24,8 @@ De details van persistentie en SQL leer je bij de cursus
 Data and Persistency. Wij gebruiken Spring Boot en Hibernate
 om het ons wat makkelijker te maken. Maar daarmee moeten we nog 
 wel leren werken.
+
+\newpage
 
 \section{Stap 1: Doorgrond de object-relational impedance mismatch}
 In onze cursus staat het objectmodel centraal. Een relationele database 
@@ -69,16 +71,22 @@ Het mooie hieraan is dat we in onze service kunnen zeggen:
 basis van onze annotaties. En die annotaties... dat is gelijk 
 het moeilijke hieraan! Daarom gaan we daarmee oefenen.
 
-\subsection{Kanttekening: Geen écht lagenmodel}
-Hiermee koppelen we wel onze datalaag aan onze domeinlaag. Dit is 
+\newpage
+\subsection{Kanttekening: Geen écht 4-lagenmodel}
+Hiermee koppelen we wel onze database-abstractielaag aan onze domeinlaag. Dit is 
 gek in het kader van een gelaagde architectuur: afhankelijkheden lopen daarin 
 meestal maar één kant op. Voor dit project staan we het echter toe.
 De impact van deze koppeling is namelijk te rechtvaardigen omdat de opslag 
 in dienst staat van het domein. Het zijn immers de domeinobjecten die we 
-willen opslaan. Willen we onze applicatie meer overeen laten komen met een 
-gelaagd systeem, dan zouden we de twee lagen kunnen samenvoegen of een expliciete 
-vertaalslag kunnen toevoegen tussen domein- en data-laag. Dat gaat voor deze cursus te ver
-en komt terug in de cursus \textbf{Software Architecture}.
+willen opslaan. In dit geval zouden we de \textit{domain} en de \textit{data}
+packages als één laag kunnen beschouwen en het systeem als 3-lagenarchitectuur
+bestempelen.
+
+Willen we onze applicatie meer overeen laten komen met een 
+4-lagensysteem, dan zouden we een expliciete 
+vertaalslag kunnen toevoegen tussen domein- en data-laag. 
+Dat gaat voor deze cursus te ver en komt terug in de cursus 
+\textbf{Software Architecture}.
 
 \section{Stap 2: Maak een logisch datamodel}
 Voordat we verder gaan, is het van belang om op basis van 
@@ -109,14 +117,15 @@ Gebruik een tool als \textit{diagrams.net}, \textit{software ideas modeler} of \
 sla het ontwerp op en exporteer het als \textit{.png} of \textit{.jpg}. 
 Neem dit op in je projectdirectory (bijvoorbeeld onder een mapje \textit{diagrams})
 en commit het resultaat, zodat je docent er naar kan kijken en er feedback op kan geven.
-Dit hoeft niet in een keer goed te zijn, dus verzand niet teveel in details.
+Dit hoeft niet perfect te zijn, dus verzand niet teveel in details.
 
+\newpage
 \section{Persistentie in Java}
 In ons project werken we met een variant van het populaire Spring-framework:
 Spring Boot. Spring Boot maakt gebruik van Spring Data JPA, wat \textit{repositories} toevoegt.
-Een repository is een opslagmechanisme voor entiteiten. In Spring Data JPA wordt 
-voor relationele databases Hibernate gebruikt, een library die de 
-gestandardiseerde Java Persistency API (JPA) implementeert.
+Een repository is een opslagmechanisme voor horende bij één entiteit of een aggregatie van entiteiten. 
+In Spring Data JPA wordt voor relationele databases Hibernate gebruikt, 
+een library die de gestandardiseerde Java Persistency API (JPA) implementeert.
 
 Hibernate is een object-relational mapper (ORM). Dit betekent vrij letterlijk
 dat het de mapping (of: vertaling) verzorgt tussen het objectmodel 
@@ -180,6 +189,7 @@ en
 door te nemen en als referentie te gebruiken (tip: doorzoek digitale bronnen met \texttt{CTRL + F}!). 
 In deze bronnen zijn ook een aantal voorbeelden opgenomen.
 
+\newpage
 \section{Stap 3: Annoteer de hoofdentiteit}
 Als het goed is hebben we één hoofdobject waar alle domeinacties
 op uitgevoerd worden.
@@ -230,9 +240,11 @@ betreft het bijvoorbeeld een \texttt{@OneToMany} (zoals bij lijsten) of een
 wijzigingen in de ene entiteit effect hebben op de andere.
 Meestal willen we dat de wijzigingen in de hoofdentiteit 
 terechtkomen in entiteiten waarnaar verwezen wordt. 
-Dit doe je door de cascadetype te specificeren in je 
-annotatie, bijvoorbeeld: \texttt{@OneToMany(cascade=CascadeType.ALL)}. 
-Hiermee voorkom je de veelvoorkomende foutmelding: 
+Dit doe je door dit te specificeren in je 
+annotatie: \texttt{@OneToMany(cascade=CascadeType.ALL)}. 
+Cascades zorgen ervoor dat wijzigingen worden doorgezet 
+naar gerelateerde entiteiten. 
+Hiermee voorkom je de foutmelding: 
 ``object references an unsaved transient instance 
 - save the transient instance before flushing''
 
@@ -294,29 +306,48 @@ Voor een lijst van kaarten werkt dit niet.
 Een goede, maar vrij geavanceerde oplossing is het aanmaken 
 van een \textit{JPA Attribute Converter}. Dit is een aparte 
 klasse die je in de datalaag kan aanmaken en als \texttt{@Converter}
-moet worden aangemerkt. Bijvoorbeeld een \texttt{CardsConverter}.
+moet worden aangemerkt. Bijvoorbeeld een \texttt{CardListConverter}.
 Deze klasse moet JPA's \texttt{AttributeConverter<T, U>}
-interface implementeren: 
+interface implementeren.
 
 \begin{minted}{java}
-public class CardsConverter implements AttributeConverter<List<Card>, String>
+@Converter
+public class CardListConverter implements AttributeConverter<List<Card>, String> {
     @Override
     public String convertToDatabaseColumn(List<Card> list) {
-        // Convert list of cards to a single string 
+        // Serialize list of cards into a single string 
         // (i.e. based on rank and suit)
         //
-        // For instance: HEARTS, SPADES, CLUBS, DIAMONDS -> H, S, C, D
-        // and: ACE, 2, 3, ... -> A, 2, 3
-        // Then, a list of cards could be formatted as: AH, 5C, 2D, meaning: Ace of Hearts, 5 of Clubs and 2 of Diamonds
+        // For instance, we could convert this according to a custom format: 
+        // HEARTS,ACE;SPADES,KING;...
     }
 
     @Override
     public List<Card> convertToEntityAttribute(String joined) {
-        // Convert a single string to list of cards
+        // Deserialize a single string into a list of cards
         // (i.e. by splitting the string and reading out the rank and suit from the string)
     }
 }
 \end{minted}
+
+Vervolgens kan je de \texttt{List<Cards>} binnen de betreffende entity
+annoteren met \texttt{@Convert(converter = CardListConverter.class)}.
+Vergeet niet om de lengte van de kolom up te daten:
+\texttt{@Column(length = 2000)}
+We slaan namelijk een hele reeks kaarten als een grote string op!
+Mogelijk dat niet elke database deze grootte voor VARCHARS ondersteunt.
+Willen we een datatype specifiek voor PostgreSQL gebruiken,
+dan kunnen we \texttt{@Column(columnDefinition = "TEXT")}
+gebruiken. Let wel dat je dan minder makkelijk van database kunt veranderen
+in de toekomst.
+
+\subsection{Kom je er niet uit?}
+Het kan soms pittig zijn om je domeinmodel te voorzien van de juiste annotaties.
+
+Lees foutmeldingen goed door, benut de Spring JPA / Hibernate documentatie en vergeet niet om 
+gewijzigde database-tabellen te DROP'en en de applicatie opnieuw te starten
+wanneer je de tabelstructuur aanpast. Vraag docenten en medestudenten om hulp
+als je het even niet ziet.
 
 Als het allemaal niet wil lukken, dan zou je een deel kunnen omzetten naar een \texttt{@Lob}:
 een large object binary. Dan wordt het object opgeslagen en uitgelezen 
@@ -325,6 +356,8 @@ wanneer de vorm van het object wijzigt in je Java-code!
 Probeer dit dus alleen te doen bij objecten die klein en/of vormvast zijn!
 
 Je hebt zelf de keuze om een van deze oplossingen te kiezen.
+Wees niet bang om je tabellen weg te gooien en opnieuw te beginnen als
+het allemaal niet helemaal werk zoals verwacht.
 
 \section{Stap 6: Maak een repository voor de hoofdentiteit}
 Het maken van een Repository is vrij eenvoudig: we \textit{extenden} een bestaande 

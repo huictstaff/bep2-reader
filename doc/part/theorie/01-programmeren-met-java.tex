@@ -369,7 +369,7 @@ een punt te zetten en er haakjes achter te zetten. Moeten we argumenten meegeven
 de parameters, dan vullen we deze in de haakjes in. Zie Voorbeeld~\ref{code:method-call},
 regel 4.
 
-\begin{listing}[ht]
+\begin{listing}[H]
 \begin{minted}[linenos]{java}
 Shape2D rectangleA = new Rectangle(10, 20);
 Shape2D rectangleB = new Rectangle(20, 30);
@@ -505,7 +505,8 @@ public class Rectangle implements Shape2D {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Rectangle rectangle = (Rectangle) o;
-        return Objects.equals(height, rectangle.height) && Objects.equals(width, rectangle.width);
+        return Objects.equals(height, rectangle.height) 
+            && Objects.equals(width, rectangle.width);
     }
 
     @Override
@@ -957,7 +958,8 @@ Met een for-loop zouden we dat bijvoorbeeld als volgt doen (Figuur~\ref{code:fil
 \begin{listing}[H]
 \begin{minted}[linenos]{java}
 public class FriendsList {
-    private List<String> names = List.of("Alex", "Bert", "Arnold", "Anton");
+    private List<String> names = 
+        List.of("Alex", "Bert", "Arnold", "Anton");
 
     public List<String> selectNamesByPrefix(String prefix) {
         List<String> selection = new ArrayList<>();
@@ -982,7 +984,8 @@ Als we gebruik maken van de Streams API ziet dezelfde method eruit als in Figuur
 \begin{listing}[H]
 \begin{minted}[linenos]{java}
 public class FriendsList {
-    private List<String> names = List.of("Alex", "Bert", "Arnold", "Anton");
+    private List<String> names = 
+        List.of("Alex", "Bert", "Arnold", "Anton");
 
     public List<String> selectNamesByPrefix(String prefix) {
         return names.stream()
@@ -1049,28 +1052,28 @@ Voor \texttt{Optional<User>} kunnen we de methodes aanroepen als in Tabel~\ref{t
     & \textbf{Beschrijving} 
     \\ \hline
         
-    \texttt{optionalUser.isPresent()}
+    \texttt{isPresent}
     & \texttt{boolean}
     & Geeft terug of er een waarde in de optional zit of niet.
     \\ \hline
 
-    \texttt{optionalUser.ifPresent(user -> System.out.println(user.getName()))}
+    \texttt{ifPresent}
     & \texttt{void}
     & Voert de meegeven \textit{consumer function} uit als er een waarde inzit, maar 
     doet niets als deze leeg is.
     \\ \hline
 
-    \texttt{optionalUser.orElse(new User("Unknown"))}
+    \texttt{orElse}
     & \texttt{User}
     & Geeft de ingesloten User terug of de aangegeven default User als de optional leeg is.
     \\ \hline
 
-    \texttt{optionalUser.orElseThrow(() -> new UserNotFoundException("User not found")}
+    \texttt{orElseThrow}
     & \texttt{User}
     & Geeft de ingesloten User terug of gooit een exception als de optional leeg is.
     \\ \hline
 
-    \texttt{optionalUser.get()}
+    \texttt{get}
     & \texttt{User} (gooit een \texttt{NoSuchElementException} als leeg)
     & Met deze methode kan je de waarde uit de Optional halen. 
     Dit kan je eigenlijk alleen doen als je weet dat de Optional een waarde bevat. 
@@ -1141,7 +1144,9 @@ het Chips-object een exception als niet aan de voorwaarden wordt voldaan!
 \begin{minted}[linenos]{java}
 public void withdraw(Long amountToWithdraw) {
     if (amountToWithdraw < 0) {
-        throw new NegativeNumberException("Cannot withdraw a negative amount: " + amountToWithdraw);
+        throw new NegativeNumberException(
+            "Cannot withdraw a negative amount: " + amountToWithdraw
+        );
     }
 
     long newAmount = this.amount - amountToWithdraw;
@@ -1178,16 +1183,28 @@ met wat voor een soort foutmelding we te maken hebben.
 \begin{listing}[H]
 \begin{minted}[linenos]{java}
 @PostMapping("/withdraw")
-public Balance withdraw(Authentication authentication, @Validated @RequestBody Withdrawal withdrawal) {
+public Balance withdraw(
+    Authentication authentication, 
+    @Validated @RequestBody Withdrawal withdrawal
+) {
     UserProfile profile = (UserProfile) authentication.getPrincipal();
 
     try {
-        Balance balance = this.service.withdrawChips(profile.getUsername(), withdrawal.amount);
+        Balance balance = this.service.withdrawChips(
+            profile.getUsername(), 
+            withdrawal.amount
+        );
         return balance;
     } catch (NotEnoughChipsException exception) {
-        throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, exception.getMessage());
+        throw new ResponseStatusException(
+            HttpStatus.PAYMENT_REQUIRED, 
+            exception.getMessage()
+        );
     } catch (NegativeNumberException exception) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception.getMessage());
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, 
+            exception.getMessage()
+        );
     }
 }
 \end{minted}
