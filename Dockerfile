@@ -16,3 +16,5 @@ RUN tlmgr install varwidth zref needspace showexpl tcolorbox
 RUN apk add python3 py-pip py3-pygments
 RUN tlmgr install fvextra catchfile upquote xstring framed minted
 RUN tlmgr install tikzfill pdfcol
+
+COPY --chmod=754 ./all.sh .

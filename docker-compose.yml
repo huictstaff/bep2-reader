@@ -1,5 +1,15 @@
 services:
-  latex: 
+  latex-release: 
     build: "."
+    image: latex-release
+    command: "./all.sh"
     volumes:
       - "./doc:/doc"
+  latex-debug: 
+    image: latex-release
+    pull_policy: never
+    tty: true
+    command: "/bin/bash"
+    volumes:
+      - "./doc:/doc"
+  
