@@ -1,9 +1,125 @@
 \chapter{Libraries en frameworks}
 
+We hebben het tot nu toe veel gehad over modules en modulariteit. 
+Een groot beoogd voordeel van al deze mooie losse legoblokjes
+is dat ze \emph{herbruikbaar} zijn. Maar als modulaire code herbruikbaar is, 
+dan is het ook hartstikke logisch dat we modules willen (her)gebruiken die door anderen geschreven zijn.
+
+Uiteraard doen we dit ook al, we gebruiken bijvoorbeeld de "standard library" van onze taal 
+(met in Java bijvoorbeeld Math.random, of String.format), maar we hebben ook op andere vlakken andermans 
+code gebruikt, om bijv. JSON te genereren. 
+
+We worden dus afhankelijk van deze externe code om de functionaliteit van onze applicatie te implementeren. 
+In vakyargon zijn we dus \emph{coupled} aan onze \emph{externe dependencies}. In principe is dit een goede zaak,
+als andere mensen mooie herbruikbare code hebben geschreven scheelt ons dat mooi tijd \& moeite. Maar zoals
+altijd kan je hier juist teveel, of te weinig gebruik van maken.
+
+Het te weinig gebruik maakt van externe dependencies noemt men wel het "Not invented here"-syndroom. 
+Je wantrouwt alle code die niet uit je eigen bedrijf komt. Dit heeft als grote nadeel dat je heel veel extra
+code zelf zal moeten schrijven. En aangezien het niet je kerntaak is om bijv. een JSON-serializer te schrijven
+zal je er veel minder tijd aan kunnen besteden, en is de kans dat de kwaliteit hieronder lijdt erg groot.
+
+Aan de andere extreme kant is er het verhaal van \href{https://en.wikipedia.org/wiki/Npm_left-pad_incident}{Leftpad Incident}.
+Leftpad was een vrij eenvoudige dependency die simpelweg spaties aan een string toevoegde. Iets dat je in relatief
+korte tijd ook zelf nog wel uittypt, maar niet zo snel als dat je het als externe code van de plank kan trekken.
+Je bent echter gekoppeld aan je dependencies, dus als die dependencies ineens verdwijnen, of onverwachte wijzigingen doorvoeren,
+dan heb je mogelijk een groot probleem. 
+
+Kortom we moeten altijd op zoek gaan naar de juiste balans hierin. De stabiliteit van de dependency is hierin
+de belangrijkste eigenschap. Daarmee bedoelen we hoe vaak, en/of hoe groot de wijzigingen zijn die je verwacht
+te moeten kunnen accepteren. Hoe stabieler de dependency, hoe minder nadelig het zal zijn om er aan gecoupled te zijn.
+
+Nu zou je kunnen denken "Maar ik hoef toch niet te updaten? Ik kan toch gewoon de oude versie blijven gebruiken?",
+en soms is dat ook zo. Echter in veel gevallen zal er vroeg of laat een kritieke bug, of beveiligingslek ontdekt 
+worden, die je wel dwingt om te upgraden. Al je dependencies goed up-to-date houden is dus een goede gewoonte.
+
+Binnen deze externe dependencies willen we wel eens onderscheid maken tussen libraries en frameworks. 
+Dit is geen super-scherp onderscheid, maar het is nuttig om verschillende perspectieven te hebben. 
+Het verschil zit in de 'flow of control', hoe kun je een lijn van acties door je broncode heen trekken. 
+
 \section{Libraries}
+
+Libraries zijn vaak wat kleinere pakketjes code, die één gericht probleem voor je oplossen. Bijvoorbeeld het 
+maken van HTTP requests (Requests, Python), het genereren van JSON (Jackson, Java), het uitvullen van Strings (Leftpad, Javascript),
+of het maken van complexere berekeningen zoals Annuïteiten (Finmath-lib, Java).
+
+Het belangrijke is dat een library namens jouw code een probleem oplost of makkelijker maakt. Maar uiteindelijk is jouw applicatie nog
+nog steeds \emph{de baas}.
+
+Bij het omgaan met libraries is het belangrijk om te beslissen hoe sterk je gecoupled wil zijn aan de library.
+Als je rechtstreeks vanuit jouw code een library aanroept, en je doet dat op meerdere plekken 
+(stel je een Python applicatie voor die op meerdere plekken Requests gebruikt om APIs aan te roepen), dan zul je 
+op al die plaatsen wijzigingen moeten doorvoeren als de library een onverwachte update uitbrengt. Dan is het een
+goed idee om in plaats daarvan een eigen class te schrijven, die zelf de library aanroept, zodat je later maar
+op één plek evt. dependency-problemen hoeft op te lossen.
+
+Verder is het ook van belang om na te denken wat die library precies vertegenwoordigt. Veel libraries omvatten
+de interactie met een extern systeem (zoals een database, een web-API, een barcodescanner, een webcam, etc.). Juist 
+dit soort externe systemen wil je vaak extra in de gaten houden, of in (Unit-)tests kunnen vervangen door iets 
+dat prettiger te testen is. Hier is het dus ook handig om een eigen class (en evt. een interface) ertussen te schuiven
+zodat je flexibel blijft in hoe je applicatie met deze externe systemen omgaat.
 
 \section{Frameworks}
 
-\section{Spring Boot}
+Frameworks zijn ook andermans code. Maar in dit geval kiezen we ervoor om de algemene opzet en structuur van 
+onze applicatie aan het framework over te laten. Denk bijvoorbeeld aan Java Servlets (BEP1, jaar 1).
+Je definiëert een class, zet die op een speciale plek neer, en override de \emph{doGet} methode. En voilá je code
+wordt uitgevoerd als er een HTTP-request binnen komt op een bepaald adres.
+
+Je hebt als programmeur totaal geen zicht op de 'applicatie eromheen', alleen op jouw kleine onderdeeltje dat je er 
+in hebt geschoven.
+
+Dit is de grote kracht van frameworks, en dat zorgt er voor dat je als beginnende programmeur al direct alle soorten
+applicaties ter wereld kan bouwen. Als het werkt tenminste. Als het niet werkt is het verdraaid lastig om er achter 
+te komen waarom nou niet.
+
+Het cruciale verschil met een library is dus dat het framework de baas is. De belangrijkste code in de applicatie, 
+de code die jij schrijft om de requirements te implementeren, is \emph{niet} de hoofdapplicatie, maar slechts een
+handig ingeschoven legoblokje dat aangeroepen wordt door het framework. Dit noemt men in vakyargon \textbf{Inversion of Control}.
+
+\section{Spring \& Spring Boot}
+
+Spring is een bekend Java framework uit 2004. 
+In de kern is het een \textbf{Dependency Injection Container}, maar wat dat precies is komen we later op terug.
+
+Spring is het best te zien als een soort universele kapstok voor Java code. Wat voor Java code je ook hebt
+(van GUI-applicaties, Webservices en Commandline applicaties tot Database libraries en Crypto-miners) ergens in Spring
+is wel een ideaal haakje om die code aan op te hangen. 
+
+Spring Boot (2014) is een framework om je te helpen met die code ophangen. Het probleem van zo'n universele kapstok
+werd namelijk (in de jaren tussen 2004 en 2014) dat het steeds ingewikkelder werd om te configureren wat nou precies
+waar moest hangen, en hoe.
+
+Spring Boot is een framework bovenop Spring die je helpt met standaard instellingen en zogeheten "Auto-configurations".
+Deze Auto-configurations kun je voorstellen als dat Spring Boot automatisch bepaalde stukken code alvast voor je ophangt.
+Als je bijv. ergens op een class een \emph{@RestController} annotatie plakt, dan concludeert Spring Boot automatisch dat
+je kennelijk een webapplicatie wil maken (en start een webserver), en hangt die class dan op de juiste plek in die server.
+
+Één van de meest eenvoudige zaken om mee te beginnen is een zogeheten CommandLineRunner (met @Component erop geplakt). 
+Dat is het Spring equivalent van de oude \emph{public static void main}.
+
+\subsection{Entry Point}
+
+Ook al is het framework in principe de baas hoe de applicatie draait. Er is altijd een baas boven baas. 
+We zullen helemaal aan het begin de controle aan het framework moeten geven. Met Spring Boot doen we dat zo:
+
+\begin{listing}[H]
+    \begin{minted}[linenos]{java}
+    @SpringBootApplication
+    public class DemoApplication {
+        public static void main(String[] args){
+            SpringApplication.run(DemoApplication.class, args);
+        }
+    }
+    \end{minted}
+    \caption{Minimale opstartcode voor een Spring Boot applicatie.}
+    \label{code:springstart}
+\end{listing}
+
+Let er op dat deze class netjes in een (named)package zit. Spring gaat er vanuit dat 
+al\footnote[]{Ok, bijna al je code, maar deze randgevallen wil je echt niet opzoeken, geloof me.} 
+je code in een named package zit, en dat alle andere code in hetzelfde package, of een subpackage zit.
+In iets nettere bewoording: Spring Boot doet een \emph{Component Scan} startend met het package waar 
+de @SpringBootApplication class in zit en al diens subpackages.
 
 \section{Maven}
