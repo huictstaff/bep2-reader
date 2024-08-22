@@ -7,7 +7,7 @@ Spelers kunnen met speelgeld (\textit{chips}) hun favoriete spelletjes spelen.
 Mogelijk dat HU-land Casino in de toekomst een betaalde variant op de markt wil zetten, 
 maar voor nu wil het bedrijf naamsbekendheid verwerven, advertenties aanbieden en ervaring opdoen. 
 
-Voor hun spelletjessite wil HU-land Casino een variant van het bekende \texit{blackjack} aanbieden. 
+Voor hun spelletjessite wil HU-land Casino een variant van het bekende \textit{blackjack} aanbieden. 
 Het deel om in te loggen is overgenomen van een bestaande component (\textit{security}). 
 Ook is er al enige functionaliteit om chips toe te voegen wanneer de speler deze niet meer heeft. 
 Omdat nog onduidelijk is op welke technologieën wordt ingezet en met welke andere systemen gecommuniceerd zal worden, 
@@ -46,7 +46,7 @@ speler. Spelers mogen niet aan elkaars spel meedoen.
 
 \subsection{Het spelverloop}
 Laten we het spelverloop van blackjack bestuderen.
-Let wel: voor een web-applicatie kan het zijn dat sommige stappen
+Let wel\: voor een web-applicatie kan het zijn dat sommige stappen
 anders kunnen verlopen, bijvoorbeeld ten behoeve van de onderhoudbaarheid
 of efficiëntie. Sommige stappen worden immers volledig geautomatiseerd. 
 Om dezelfde reden kunnen sommige stappen worden samengevoegd. 
@@ -99,19 +99,19 @@ Per kaart wordt de score bepaald op basis van de rang (\textit{rank}) van de kaa
 \end{itemize}
 
 De handscore wordt bepaald door deze scores bij elkaar op te tellen, 
-zie Tabel~\ref{table:handscores}.
+zie Tabel \ref{table:handscores}.
 
 \begin{table}[H]
     \centering
     \begin{tabularx}{0.4\textwidth}{|l|X|}
         \hline
         \textbf{Kaarten} & \textbf{Handscore} \\ \hline
-        \heartsuit 2, \clubsuit 3 & 5 \\ \hline
-        \clubsuit 10, \diamondsuit 5, \heartsuit 3, \spadesuit2 & 20 \\ \hline
-        \heartsuit 10, \clubsuit K  & 20                 \\ \hline
-        \spadesuit A, \diamondsuit 4 & 15 (of: 5)         \\ \hline
-        \clubsuit A, \diamondsuit K & 21 (of: 11)         \\ \hline
-        \clubsuit A, \heartsuit A & 12                 \\ \hline
+        $\heartsuit 2, \clubsuit 3$ & 5 \\ \hline
+        $\clubsuit 10, \diamondsuit 5, \heartsuit 3, \spadesuit2$ & 20 \\ \hline
+        $\heartsuit 10, \clubsuit K$  & 20                 \\ \hline
+        $\spadesuit A, \diamondsuit 4$ & 15 (of: 5)         \\ \hline
+        $\clubsuit A, \diamondsuit K$ & 21 (of: 11)         \\ \hline
+        $\clubsuit A, \heartsuit A$ & 12                 \\ \hline
     \end{tabularx}
     \caption{Voorbeelden van handscores.}
     \label{table:handscores}
