@@ -7,12 +7,12 @@ dan is het ook hartstikke logisch dat we modules willen (her)gebruiken die door 
 
 Uiteraard doen we dit ook al, we gebruiken bijvoorbeeld de "standard library" van onze taal 
 (met in Java bijvoorbeeld Math.random, of String.format), maar we hebben ook op andere vlakken andermans 
-code gebruikt, om bijv. JSON te genereren. 
+code gebruikt, om bijv. JSON te genereren.
 
 We worden dus afhankelijk van deze externe code om de functionaliteit van onze applicatie te implementeren. 
-In vakyargon zijn we dus \emph{coupled} aan onze \emph{externe dependencies}. In principe is dit een goede zaak,
+In vakyargon zijn we dus \emph{coupled} aan onze \emph{externe dependencies}. In principe is dit een goede zaak:
 als andere mensen mooie herbruikbare code hebben geschreven scheelt ons dat mooi tijd \& moeite. Maar zoals
-altijd kan je hier juist teveel, of te weinig gebruik van maken.
+altijd kan je hier juist teveel, of te weinig gebuik van maken.
 
 Het te weinig gebruik maakt van externe dependencies noemt men wel het "Not invented here"-syndroom. 
 Je wantrouwt alle code die niet uit je eigen bedrijf komt. Dit heeft als grote nadeel dat je heel veel extra
@@ -95,9 +95,6 @@ Deze Auto-configurations kun je voorstellen als dat Spring Boot automatisch bepa
 Als je bijv. ergens op een class een \emph{@RestController} annotatie plakt, dan concludeert Spring Boot automatisch dat
 je kennelijk een webapplicatie wil maken (en start een webserver), en hangt die class dan op de juiste plek in die server.
 
-Één van de meest eenvoudige zaken om mee te beginnen is een zogeheten CommandLineRunner (met @Component erop geplakt). 
-Dat is het Spring equivalent van de oude \emph{public static void main}.
-
 \subsection{Entry Point}
 
 Ook al is het framework in principe de baas hoe de applicatie draait. Er is altijd een baas boven baas. 
@@ -122,4 +119,110 @@ je code in een named package zit, en dat alle andere code in hetzelfde package, 
 In iets nettere bewoording: Spring Boot doet een \emph{Component Scan} startend met het package waar 
 de @SpringBootApplication class in zit en al diens subpackages.
 
+\subsection{Hotspots}
+
+Uiteraard moet niet alleen het framework opstarten en het zware werk van ons overnemen. Op een gegeven moment
+moet het ook de controle weer teruggeven aan onze eigen stukken code.
+
+Één van de meest eenvoudige zaken om mee te beginnen is een zogeheten CommandLineRunner (met @Component erop geplakt). 
+Dat is het Spring equivalent van de oude \emph{public static void main}.
+
+\begin{listing}[H]
+    \begin{minted}[linenos]{java}
+    @Component
+    public class StartupRunner implements CommandLineRunner {
+        @Override
+        public void run(String... args) throws Exception {
+            System.out.println("Hello World!");
+        }
+    }
+    \end{minted}
+    \caption{Hello World vanuit een System.out in een Spring applicatie.}
+    \label{code:springhello}
+\end{listing}
+
+We zien in \ref{code:springhello} een aantal onderdelen. @Component zorgt er voor dat Spring zich bewust wordt van
+deze class (mits die zich in het path van de \emph{Component Scan} bevindt zoals eerder genoemd).
+Vervolgens weet Spring wat er met deze class gedaan moet worden omdat de CommandLineRunner interface geimplementeerd wordt:
+deze class zal kennelijk op de Command Line simpelweg gerun'd moeten worden.
+
+Uiteraard is dit complete overkill voor een simpele Hello World applicatie. Maar een CommandLineRunner kan erg
+handig zijn om bepaalde opstartlogica te implementeren (bijv. alvast wat dummy-data voor je applicatie).
+
+Een andere veelgebruikt integratie-punt in deze cursus is de RestController (\ref{code:resthello}).
+
+\begin{listing}[H]
+    \begin{minted}[linenos]{java}
+    @RestController
+    public class HelloController {
+        @GetMapping("/hello")
+        public String hello() {
+            return "Hello World!";
+        }
+    }
+    \end{minted}
+    \caption{Hello World vanuit een Spring RestController.}
+    \label{code:resthello}
+\end{listing}
+
+De @RestController annotatie, een soort subclass van @Component, geeft aan dat deze class methods gaat bevatten
+die vanuit een HTTP request aangeroepen moeten kunnen gaan worden. De @GetMapping even verderop is zo'n voorbeeld daarvan.
+Als deze class gevonden wordt in de \emph{Component Scan}, dan zal Spring een webserver starten (standaard op
+\href{http://localhost:8080}) en daarbinnen een request naar \href{http://localhost:8080/hello} doorverwijzen naar deze
+methode.
+
 \section{Maven}
+
+Een belangrijk punt aan \emph{externe} dependencies is dat ze extern zijn. Oftewel, de broncode van deze 
+libraries of frameworks zit niet in onze repository. Vroeger betekende dat goed documenteren welke externe 
+dependencies je nodig had, en hopen dat de lezer wist waar deze gevonden en gedownload kunnen worden.
+
+Gelukkig kunnen we (sinds 2004) gebruik maken van Maven, een command-line tool (maar die ook goed in IDEs geïntegreerd is). 
+Maven is gebaseerd op het idee van Package Managers van
+Operating Systems zoals bijv. \href{https://en.wikipedia.org/wiki/APT_(software)}{APT} voor Linux, 
+\href{https://chocolatey.org/}{Chocolatey} voor Windows, of \href{https://brew.sh/}{Homebrew} voor Mac. 
+Dat zijn programmas waar je de naam van een library of applicatie opgeeft en de Package Manager installeert het.
+Dat is vaak veel handiger dan je browser openen, via google proberen de juiste site te vinden, 
+uitvogelen hoe deze website nou weer georganiseerd is, een installer downloaden, 
+en op 'next' drukken totdat de installer tevreden is met je inspanningen.
+
+Wat we willen is in een plain-text document (want dat werkt fijn met versiebeheer tools zoals \textit{Git}) aangeven welke
+dependencies er precies nodig zijn, en dat deze lijst van dependencies dan volautomatisch gedownload wordt. Maven doet dit door
+middel van de 'dependencies' sectie in de \textit{pom.xml} (Pom staat voor Project Object Model\footnote{
+    Een niet bijzonder behulpzame naamgeving. Dus voel je vrij om aan het Surinaamse gerecht te denken, dat doe ik ook\ldots }).
+In de 'dependencies' sectie van je pom staan de zogeheten \emph{Maven Coordinates} van de externe library die je wilt hebben.
+Die coordinates bestaan uit 3 dingen: een groupId (wie heeft het gemaakt), een artifactId (hoe heet de dependency), 
+en tot slot een version. Soms wordt dit opgeschreven in XML (\ref{maven:example1}), soms achter elkaar met dubbele punten ertussen:
+\textit{org.junit.jupiter:junit-jupiter:5.10.2}.
+
+Het handige is nu dat als bijv. \textit{junit-jupiter} zelf ook dependencies heeft (je kunt bijv. in IntelliJ CTRL-klikken op Junit in je pom om die te zien), dat
+Maven ook automatisch die dependencies gaat downloaden. En als die dependencies dan weer dependencies hebben, dan pakt Maven die ook mee,
+enzovoorts enzovoorts. Deze dependencies van je dependencies noemt men ook wel Transitieve Dependencies.
+
+\begin{listing}[H]
+    \begin{minted}[linenos]{xml}
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.2</version>
+        </dependency>
+    </dependencies>
+    \end{minted}
+    \caption{Voorbeeld xml dependency in Maven.}
+    \label{maven:example1}
+\end{listing}
+
+Naast Dependency Management is Maven ook een handige \emph{build-tool}. Vanuit een IDE als \emph{IntelliJ} merk je er weinig
+van, maar als je zonder IDE (en zonder Maven) een Java programma zou moeten compileren, dan zou je vroeger 
+één voor één \textit{javac Jouw-Class-Hier.java} voor al je bestanden moeten uittypen. 
+Maven compileert, met het commando \emph{mvn compile}, automatisch alle bestanden die onder ./src/main/java 
+(en nog een paar directories zoals bijv. ./src/test/java) staan.
+
+Twee andere belangrijke commandos om te kennen zijn \emph{mvn verify}, dit draait al je automatische tests, 
+en \emph{mvn package}, dit maakt een mooi .Jar (Java Archive) bestand van al je gecompileerde code. Zo'n Jar file is 
+stiekem gewoon een .zip bestand (die je dus ook als zip kan uitpakken) met al je gecompileerde .class files.
+
+Maven is een oude, uitgebreide tool en heeft dus nog allerhande andere functionaliteiten (zoals het hosten van een documentatie website), 
+en nog vele subtiliteiten (zoals de "dependencymanagement" sectie, die weer totaal anders werkt dan de "dependencies" sectie), en dan
+hebben we het nog niet eens over het concept Lifecycles gehad. Maar voor nu weet je genoeg om met Maven te gaan stoeien.
