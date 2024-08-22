@@ -1,0 +1,33 @@
+\documentclass[dutch,a4paper,12pt,doubleside]{book}
+
+\input{config}
+
+\renewcommand\indexname{Trefwoorden}
+\makeindex
+
+\hypersetup{
+  colorlinks,
+  allcolors=[rgb]{0.3,0.3,0.8},
+  linktoc=all
+}
+
+\title{BEP2 Reader}
+\author{A. Rothuis}
+
+\begin{document}
+
+\maketitle
+
+{\hypersetup{linkcolor=black}
+\tableofcontents
+}
+
+
+% \part{De cursus}
+\input{part/cursus/cursusopzet}
+
+% \printindex
+\bibliographystyle{plain}
+\bibliography{sources}
+
+\end{document}

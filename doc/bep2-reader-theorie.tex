@@ -1,0 +1,49 @@
+\documentclass[dutch,a4paper,12pt,doubleside]{book}
+
+\input{config}
+
+\renewcommand\indexname{Trefwoorden}
+\makeindex
+
+\hypersetup{
+  colorlinks,
+  allcolors=[rgb]{0.3,0.3,0.8},
+  linktoc=all
+}
+
+\title{BEP2 Reader}
+\author{A. Rothuis \and T. Kemper}
+
+\begin{document}
+
+\maketitle
+
+{\hypersetup{linkcolor=black}
+\tableofcontents
+}
+
+
+% \part{De cursus}
+% \input{part/cursus/cursusopzet}
+
+% \part{De theorie}
+\input{part/theorie/00-structurele-kwaliteit}
+\input{part/theorie/01-programmeren-met-java}
+\input{part/theorie/02-object-orientatie}
+\input{part/theorie/03-softwarearchitectuur}
+\input{part/theorie/04-frameworks}
+
+% \part{De opdracht}
+% \input{part/opdracht/00-opdrachtbeschrijving}
+% \input{part/opdracht/01-projectopzet-en-analyse}
+% \input{part/opdracht/02-use-cases-en-domeinmodel}
+% \input{part/opdracht/03-application-service}
+% \input{part/opdracht/04-web-api}
+% \input{part/opdracht/05-persistentie}
+% \input{part/opdracht/06-principles-en-patterns}
+
+% \printindex
+\bibliographystyle{plain}
+\bibliography{sources}
+
+\end{document}
