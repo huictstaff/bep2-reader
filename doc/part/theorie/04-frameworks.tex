@@ -57,7 +57,8 @@ Verder is het ook van belang om na te denken wat die library precies vertegenwoo
 de interactie met een extern systeem (zoals een database, een web-API, een barcodescanner, een webcam, etc.). Juist 
 dit soort externe systemen wil je vaak extra in de gaten houden, of in (Unit-)tests kunnen vervangen door iets 
 dat prettiger te testen is. Hier is het dus ook handig om een eigen class (en evt. een interface) ertussen te schuiven
-zodat je flexibel blijft in hoe je applicatie met deze externe systemen omgaat.
+zodat je flexibel blijft in hoe je applicatie met deze externe systemen omgaat. Zo'n tussenlaagje noemt men ook wel
+een \emph{Gateway}.
 
 \section{Frameworks}
 
@@ -168,7 +169,7 @@ Een andere veelgebruikt integratie-punt in deze cursus is de RestController (\re
 De @RestController annotatie, een soort subclass van @Component, geeft aan dat deze class methods gaat bevatten
 die vanuit een HTTP request aangeroepen moeten kunnen gaan worden. De @GetMapping even verderop is zo'n voorbeeld daarvan.
 Als deze class gevonden wordt in de \emph{Component Scan}, dan zal Spring een webserver starten (standaard op
-\href{http://localhost:8080}) en daarbinnen een request naar \href{http://localhost:8080/hello} doorverwijzen naar deze
+\href{http://localhost:8080}{http://localhost:8080}) en daarbinnen een request naar \href{http://localhost:8080/hello}{http://localhost:8080/hello} doorverwijzen naar deze
 methode.
 
 \section{Maven}
