@@ -2,9 +2,6 @@
 
 \input{config}
 
-\renewcommand\indexname{Trefwoorden}
-\makeindex
-
 \hypersetup{
   colorlinks,
   allcolors=[rgb]{0.3,0.3,0.8},
@@ -16,16 +13,10 @@
 
 \begin{document}
 
-\maketitle
-
-{\hypersetup{linkcolor=black}
-\tableofcontents
-}
-
 % \part{De opdracht}
 \input{part/opdracht/00-opdrachtbeschrijving}
 \input{part/opdracht/01-projectopzet-en-analyse}
-\input{part/opdracht/02-use-cases-en-domeinmodel}
+\input{part/opdracht/02-domeinmodel-implementeren}
 \input{part/opdracht/03-application-service}
 \input{part/opdracht/04-web-api}
 \input{part/opdracht/05-persistentie}

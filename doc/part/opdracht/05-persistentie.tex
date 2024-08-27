@@ -25,7 +25,174 @@ Data and Persistency. Wij gebruiken Spring Boot en Hibernate
 om het ons wat makkelijker te maken. Maar daarmee moeten we nog 
 wel leren werken.
 
-\newpage
+\section{Het opzetten van de database}
+
+In deze cursus zetten we het liefst de database op met een developer-hulp-programma genaamd Docker. 
+Latere cursussen maken nog een boel gebruik van Docker, dus het is aan te raden zo vroeg mogelijk aan
+dit programma gewend te raken.
+
+\subsection{Een database met Docker}
+Heb je het project op je machine staan? Open het in je IDE (bij voorkeur IntelliJ).
+
+Je kan het project op twee manieren opzetten: met Docker of zonder Docker. 
+Zie ook de README.md van het project. 
+
+Het wordt aangeraden om Docker en docker-compose te gebruiken om het project op te starten.
+Docker zorgt ervoor dat de technische afhankelijkheden niet apart geïnstalleerd hoeven te worden,
+maar herbruikbaar in het project zelf kunnen worden opgenomen.
+Docker wordt daarom veel gebruikt in de praktijk om de infrastructuur gelijksoortig te houden 
+of je nu op development-, test- of productie-omgeving aan het werk bent.
+
+In het geval van dit project gaat het om een voorgeconfigureerde PostgreSQL-database.
+
+\subsubsection{Installeer Docker}
+
+Als je op Windows werkt dan zul je eerst nog iets anders moeten installeren, namelijk WSL\footnote{WSL 2 om precies te zijn}.
+WSL staat voor "Windows Subsystem for Linux" en het zorgt er voor dat je Docker op een 
+snellere en stabielere manier kan draaien. 
+WSL en Docker hebben in het verleden echter nogal eens gezorgd voor laptops (of desktops) die niet meer opstarten.
+Neem dus het zekere voor het onzekere en \textbf{\emph{BACKUP AL JE BELANGRIJKE BESTANDEN}}.
+
+Zie de 
+\href{https://learn.microsoft.com/en-us/windows/wsl/install}{WSL download pagina} voor verdere details
+over het installeren van WSL 2.
+
+Download en installeer Docker desktop via de 
+\href{https://www.docker.com/products/docker-desktop}{Docker download pagina}.
+Volg de instructies op genoemd op de site.
+
+Vraag studenten en docenten om hulp als je er niet uit komt.
+
+\subsubsection{Opstarten met docker-compose}
+Als Docker geïnstalleerd is, kan je de database opstarten met docker-compose.
+Navigeer in de commandline naar de project directory (je kunt in je IDE meestal ook een terminal window openen).
+In de project directory kan je \texttt{docker-compose up} draaien vanaf de commandline. 
+De eerste keer duurt dit even: de container voor PostgreSQL wordt gedownload, geconfigureerd,
+gebouwd als image en vervolgens wordt de image opgestart.
+De volgende keer dat je docker-compose runt wordt alleen de voorgeconfigureerde image opgestart.
+
+Als je de database op de achtergrond wil draaien (in plaats van dat hij actief in je commandline blijft),
+kan je ook \texttt{docker-compose start} gebruiken in plaats van \texttt{docker-compose up}.
+
+Gaat er iets mis met \texttt{docker-compose} en wil je de container image opnieuw bouwen,
+dan kan je \texttt{docker-compose up --build -V} gebruiken.
+
+Hoe dit precies werkt hoef je voor deze cursus niet te weten,
+maar ben je hierin geïnteresseerd, kijk dan eens naar de \texttt{docker-compose.yml}
+en in \texttt{development/db} binnen het project. Hier staat alles in gedefinieerd.
+Zo wordt er een algemene admin-gebruiker voor PostgreSQL met als username en password 
+\texttt{admin} en \texttt{admin} aangemaakt. Ook worden er automatisch username, password en database 
+aangemaakt onder de naam \texttt{bep2-huland-casino}.
+
+De standaardpoort van PostgreSQL is \texttt{5321}. Wij herschrijven deze poort in docker-compose.yml
+naar \texttt{15432} om conflicten te voorkomen met een bestaande PostgreSQL instantie. 
+De connectiedetails worden beschreven in de projectconfiguratie onder src/main/resources/application.properties:
+
+\begin{minted}{ini}
+spring.datasource.url=jdbc:postgresql://localhost:15432/bep2-huland-casino
+spring.datasource.username=bep2-huland-casino
+spring.datasource.password=bep2-huland-casino
+\end{minted}
+
+Zie hieronder meer over hoe je moet verbinden met PostgreSQL.
+
+\subsubsection{Problemen oplossen met Docker / PostgreSQL}
+Check altijd of Docker Desktop draait en of onze PostgreSQL-image wel is opgestart!
+
+Als data niet lijkt te worden opgeslagen in Docker, zorg dan dat Docker een `volume' kent om 
+naar weg te schrijven. Voeg deze directory of de parent directory toe via de Docker user interface 
+onder \texttt{Settings > Resources > File Sharing}.
+
+Als je niet met de database lijkt te kunnen verbinden, check dan of Docker 
+wel bij het (virtuele) netwerk van de host kan.
+
+\subsection{Starten zonder Docker}
+Hoewel Docker wordt aangeraden, kan het voorkomen dat dit op jouw systeem 
+om wat voor een reden dan ook niet lukt. Dan moeten we PostgreSQL handmatig instellen.
+Daarvoor moeten we een aantal zaken handmatig installeren en configureren in het project.
+
+\subsubsection{PostgreSQL installeren}
+Zorg dat PostgreSQL geïnstalleerd is. Dit moet je ook voor de cursus Data \& Persistency doen.
+Je kan ook de instructies voor die cursus erbij pakken!
+Zie: \href{https://www.postgresql.org/download/}{Postgres website}.
+
+Dit is een database die je gebruikt voor de ontwikkeling van webapplicaties met persistentie.
+Zorg dat je de hoofddatabase en de admin-inloggegevens onthoudt of bewaart.
+Ben je dit vergeten, dan kan je het best PostgreSQL opnieuw installeren.
+
+\subsubsection{Verbinden met de database}
+Zorg dat je een tool hebt om handmatig te verbinden met de database.
+Hiervoor kan je je \textit{IntelliJ} gebruiken of een tool als \textit{pgAdmin}.
+Om via IntelliJ te verbinden, kan je de instructies uitvoeren die te vinden zijn op:
+\href{https://www.jetbrains.com/help/idea/connecting-to-a-database.html#connect-to-postgresql-database}{Helppagina Jetbrains}.
+De instructies zijn vergelijkbaar voor DataGrip.
+
+Voor \textit{pgAdmin}, zie: \href{https://www.pgadmin.org/}{Website pgAdmin}.
+
+De volgende gegevens heb je nodig voor het verbinden met de hoofddatabase:
+\begin{itemize}
+    \item \textbf{Host}: \texttt{localhost}
+    \item \textbf{Port}: \texttt{5432} (met Docker: \texttt{15432})
+    \item \textbf{Database}: \texttt{<admin database>} (met Docker: \texttt{postgres})
+    \item \textbf{Username}: \texttt{<admin user>} (met Docker: \texttt{admin})
+    \item \textbf{Username}: \texttt{<admin password>} (met Docker: \texttt{admin})
+\end{itemize}
+
+\subsubsection{Database en gebruikers instellen}
+Als we geen Docker hebben gebruikt, moeten we zorgen dat de database, username en password voor \texttt{bep2-huland-casino}
+worden aangemaakt. Hiervoor kan je de volgende queries uitvoeren.
+
+De user (en password) maak je aan met de volgende SQL-query (gebruik een raw query in je database-tool):
+\begin{minted}{sql}
+CREATE USER "bep2-huland-casino" WITH CREATEDB PASSWORD 'bep-huland-casino';
+\end{minted}
+
+De database maak je als volgt aan met de juiste gebruiker (gebruik een raw query in je database-tool): 
+\begin{minted}{sql}
+CREATE DATABASE "bep2-huland-casino" OWNER "bep2-huland-casino";
+\end{minted}
+
+\subsubsection{Projectinstellingen veranderen}
+De standaardpoort van PostgreSQL is \texttt{5321}. 
+Ons project staat ingesteld om te verbinden met poort \texttt{15321}, omdat we 
+dat met Docker doen om niet met andere PostgreSQL-instanties in de knoop te komen.
+
+We kunnen aanpassen hoe onze applicatie met de applicatie verbindt via 
+de configuratie in src/main/resources/application.properties.
+Zorg dat deze er als volgt uitziet:
+\begin{minted}{ini}
+spring.datasource.url=jdbc:postgresql://localhost:5432/bep2-huland-casino
+spring.datasource.username=bep2-huland-casino
+spring.datasource.password=bep2-huland-casino
+\end{minted}
+
+Heb je iets veranderd en werkt het? 
+Commit je wijzigingen met een duidelijke naam, 
+bijvoorbeeld: "Customize database configuration". 
+Push de wijzigingen naar je remote GitHub repository.
+
+\subsection{De applicatie starten}
+Als onze database draait kunnen we onze applicatie starten.
+Dit kunnen we doen door in onze IDE op de play-knop te drukken naast de main-method 
+van de klasse CasinoApplication. Of het Maven-commando \texttt{spring-boot:start}.
+Dit commando kan je in de IDE uitvoeren (Maven-paneel rechts of via het menu \texttt{View > Tool Windows > Maven}). 
+Ook kan je de commandline gebruiken: \texttt{mvnw spring-boot:start}.
+
+Als het goed is, zie je nu in de commandline allerlei log-berichten. De laatste regels 
+zouden moeten gaan over dat de applicatie te bereiken is op poort \texttt{8080}.
+Zie je dit niet en in plaats daarvan een lange foutmelding. Scroll dan omhoog (of omlaag)
+naar de plek waar je meer informatie kan vinden over deze fout. Probeer dit te googelen 
+om er meer over te weten te komen. 
+
+Twee veelvoorkomende fouten:
+\begin{itemize}
+    \item De database is onbereikbaar: zorg dat je bovenstaande instructies hebt gevolgd om de database (met of zonder Docker)
+    draaiende te krijgen.
+    \item De poort 8080 is al in gebruik: er draait al een web-applicatie op poort 8080. 
+    Sluit deze applicatie af of stel een andere poort in in de application.properties.
+\end{itemize}
+
+Kan je de fout niet oplossen? Trek dan even aan de bel bel je docent of medestudenten!
 
 \section{Stap 1: Doorgrond de object-relational impedance mismatch}
 In onze cursus staat het objectmodel centraal. Een relationele database 
@@ -178,8 +345,6 @@ dat zich als verzameling gedraagt.
 Een DAO is een specifieke vorm van een \textit{gateway}: 
 een interface naar buiten toe dat verschillende implementaties kan hebben.
 Hierover later meer.
-In ons project wordt de implementatie verzorgt door Spring zelf, op basis van wat 
-wij hebben geconfigureerd in de \textit{application.properties} en de \textit{entities}.
 
 \subsection{Overzicht Spring Data JPA en Hibernate}
 Het is zeer de moeite waard om de documentatie van 
@@ -360,7 +525,45 @@ Wees niet bang om je tabellen weg te gooien en opnieuw te beginnen als
 het allemaal niet helemaal werk zoals verwacht.
 
 \section{Stap 6: Maak een repository voor de hoofdentiteit}
-Het maken van een Repository is vrij eenvoudig: we \textit{extenden} een bestaande 
+
+In JPA heb je twee gangbare manieren om een repository te maken. De eerste manier is om 
+op basis van de \textit{EntityManager} interface een repository te implementeren.
+
+De EntityManager is een JPA-specifieke wrapper om de Hibernate Session interface heen. Dus
+als je met een Hibernate Session (vanuit het vak Data \& Persistenty) kan omgaan, dan
+kan je ook met een EntityManager omgaan.
+
+De Chips-repository heeft een voorbeeldimplementatie met behulp van een EntityManager (excerpt in
+\ref{pers:entitymanager}).
+
+\begin{figure}
+\begin{minted}{java}
+@Component
+public class JpaChipsRepository implements ChipsRepository {
+
+    private final EntityManager entities;
+
+    public JpaChipsRepository(EntityManager entities) {
+        this.entities = entities;
+    }
+
+    @Override
+    public void save(Chips chips) {
+        entities.persist(chips);
+    }
+
+    //Etc. voor de andere methods
+}    
+\end{minted}
+\label{pers:entitymanager}
+\end{figure}
+
+Deze aanpak, waarbij we de ORM laag achter een interface verstoppen is vrij standaard, maar 
+Spring heeft nog een (technisch indrukwekkende) optie, in de vorm van \textit{Spring Data Repositories}.
+
+\subsection{Spring Data Repositories}
+
+Het maken van een Spring Data Repository is vrij eenvoudig: we \textit{extenden} een bestaande 
 generieke repository interface. Spring biedt een aantal verschillende aan, elk met 
 weer een stukje extra functionaliteit. De meest basale is \texttt{Repository<T, ID>},
 deze geeft aan dat het om een repository gaat voor een bepaalde entiteit die benaderbaar is 
@@ -396,7 +599,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface GameRepository extends JpaRepository<Game, Long> {}
 \end{minted}
 
-Merk op dat de klasse leeg kan blijven omdat we extenden van Spring's repositories.
+Merk op dat de klasse leeg kan blijven omdat we extenden van Spring's repositories. Dit is echt een 
+bijzonder staaltje werk van Spring. Normaal moet je voor een interface altijd \textbf{zelf} een 
+implementatie schrijven (want een interface bevat alleen de 'vorm' van een type). In dit geval
+genereert Spring een implementatie voor je. Voor de liefhebber, dit doet Spring op basis van de 
+\textit{org.springframework.data.jpa.repository.support.SimpleJPARepository}. Deze kun je vinden 
+als je in IntelliJ je external libraries openklapt, en dan \textit{Maven: org.springframework.data:spring-data-jpa:...}
+openklapt.
 
 \section{Stap 7: Verbeter de applicatieservices}
 Zorg dat onze applicatieservice bij onze repository kan door 
