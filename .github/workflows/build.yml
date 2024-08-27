@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4      
-      - name: Build HTML
+      - name: Build PDF
         run: |
           docker compose run --rm latex-release   
       - uses: "marvinpinto/action-automatic-releases@latest"
