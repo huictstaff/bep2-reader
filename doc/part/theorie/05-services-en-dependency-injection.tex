@@ -499,3 +499,90 @@ uit \ref{di:constructordi}) de JUnit test in injecteren. Dat zou er dan als in \
 
 Dus in de meeste gevallen zorgt @Autowired voor problemen bij het testen. Maar als je nou juist Spring iets in je test 
 wil laten injecteren is het je enige optie. 
+
+\subsubsection*{Spring Boot \& \@Configuration}
+
+Annotaties als @Component, @Service, @RestController zijn voorbeelden van annotaties waarmee we 
+classes aanmelden bij de Spring ApplicationContext (de DI Container) als bruikbare bouwstenen van 
+onze applicatie.
+
+Er zijn uiteraard nog meer manieren om bruikbare bouwstenen (Beans\footnote{
+Beans is een heel erg overloaded woord in Java. Java is een eiland dat bekend staat om koffie. Dus
+meerdere teams van programmeurs willen graag de koffiebonen grap maken. Spring Beans zijn dus hele 
+andere dingen dan Java Beans in andere frameworks. Onfortuinlijk, maar helaas\ldots
+} in Spring terminologie). Als je b.ijv. later in de opleiding message-queues gaat gebruiken dan 
+registreert de @RabbitListener annotatie ook een nieuwe Bean, en zo zullen veel Spring-uitbreidingen
+hun eigen nieuwe @BeanRegistratie-variant-annotatie hebben.
+
+Er is echter nog een andere handige, maar iets complexere manier om Beans te registreren, namelijk met
+@Configuration classes. 
+
+\begin{listing}[H]
+    \begin{minted}[linenos]{java}
+    @Configuration
+    public class GreeterConfiguration {
+
+        @Bean
+        @RequestScope
+        public Greeter createGreeter(){
+            if(LocalDate.now().getDayOfWeek() == DayOfWeek.MONDAY){
+                return new ImpoliteGreeter();
+            }else{
+                return new PoliteGreeter();
+            }
+        }
+    }
+
+    public class PoliteGreeter implements Greeter {
+        public String createGreeting(String name){
+            return "Greetings " + name;
+        } 
+    }
+
+    public class ImpoliteGreeter implements Greeter {
+        public String createGreeting(String name){
+            return "Yo " + name;
+        } 
+    }
+    \end{minted}
+    \caption{Spring Dependency Injection met @Configuration.}
+    \label{di:springconfiguration}
+\end{listing}
+
+In voorbeeld \ref{di:springconfiguration} zien we een variant van \ref{di:springexample}. 
+Spring is zo opgezet dat bij het opstarten er wordt gezocht naar @Configuration classes, en (de 
+resultaten van) alle methods op die classes die een @Bean opleveren worden geregistreerd 
+als dependency.
+
+Deze configuratie geeft aan dat we op maandag chagrijnig zijn, en onbeleefd mensen groeten, maar
+dat we er de rest van de week beter aan toe zijn. Standaard worden deze @Beans als Singleton 
+geregistreerd, dus dat zou betekenen dat als we op maandag de applicatie opstarten, dat we 
+(zolang we de applicatie niet afsluiten) ook op dinsdag en verder onbeleefd zouden blijven groeten.
+De annotatie @RequestScope geeft aan dat deze methode elk HttpRequest opnieuw uitgevoerd moet worden,
+zodoende zal dus op dinsdag automatisch onze groet overschakelen op de beleefde variant.
+
+In de praktijk gebruik je dit soort functies vooral om onder verschillende omstandigheden andere 
+dependencies te gebruiken. Een realistischer voorbeeld is bijv. het versturen van Emails, dat is 
+nog best ingewikkeld, en veel bedrijven betalen hier liever een derde partij voor dan dat ze hun 
+eigen mailserver gaan opzetten en onderhouden\footnote{Email is echt een \href{https://cfenollosa.com/blog/after-self-hosting-my-email-for-twenty-three-years-i-have-thrown-in-the-towel-the-oligopoly-has-won.html}{moeras}\ldots}.
+Dat houdt natuurlijk in dat je een klein bedrag per mailtje betaald. Superhandig voor je productie-omgeving.
+Minder handig voor je development-omgeving. Er zijn in Spring andere manieren om deze usecase te voldoen,
+zoek bijv. maar eens op @Profile's, maar deze aanpak werkt in het algemeen.
+
+
+\section{Samenvatting}
+
+In dit hoofdstuk hebben we het concept van Services geïntroduceerd. Classes die op een hoog niveau
+aangeven wat de Applicatie kan doen, ongeacht hoe "het knopje er aan de buitenkant uitziet".
+
+Deze Services hebben vaak veel andere diensten nodig. En Dependency Injection is een duidelijke,
+flexibele, en toch nog enigszins overzichtelijke manier om deze benodigde classes aan te leveren. 
+Constructor Injection is hierbij de meest gewenste manier om het aan te pakken.
+
+Spring is in de basis een Dependency Injection Container. Een framework dat automatisch volgens 
+de gewoontes van Dependency Injection objecten voor je opbouwt, en (zoals een framework betaamd)
+deze objecten aan het werk zet (zo zal een CommandLineRunner op de Commandline runnen, en een RestController
+naar HTTP-requests gaan luisteren bijv.).
+
+Spring Boot zorgt er voor dat we hier niet heel veel ingewikkelde dingen hoeven doen, maar vooral 
+door middel van attributen er voor kunnen zorgen dat het geheel overzichtelijke geconfigureerd wordt.

@@ -194,14 +194,31 @@ middel van de 'dependencies' sectie in de \textit{pom.xml} (Pom staat voor Proje
 In de 'dependencies' sectie van je pom staan de zogeheten \emph{Maven Coordinates} van de externe library die je wilt hebben.
 Die coordinates bestaan uit 3 dingen: een groupId (wie heeft het gemaakt), een artifactId (hoe heet de dependency), 
 en tot slot een version. Soms wordt dit opgeschreven in XML (\ref{maven:example1}), soms achter elkaar met dubbele punten ertussen:
-\textit{org.junit.jupiter:junit-jupiter:5.10.2}.
+\textit{org.junit.jupiter:junit-jupiter:5.10.2}. 
 
 Het handige is nu dat als bijv. \textit{junit-jupiter} zelf ook dependencies heeft (je kunt bijv. in IntelliJ CTRL-klikken op Junit in je pom om die te zien), dat
 Maven ook automatisch die dependencies gaat downloaden. En als die dependencies dan weer dependencies hebben, dan pakt Maven die ook mee,
 enzovoorts enzovoorts. Deze dependencies van je dependencies noemt men ook wel Transitieve Dependencies.
 
+Verder zie je in \ref{maven:example1} dat ons project zelf ook een volledige set Maven-coordinates heeft
+(groupId, artifactId en version). Dat is voor nu niet relevant, maar als we ooit ons project zouden willen 
+uploaden naar het publieke internet, dan zijn dat de coordinates waarmee anderen ons als dependency
+kunnen toevoegen. Voor nu moet het, omdat het nou eenmaal verplicht is in Maven om dit op te geven\footnote{
+    De toevoeging SNAPSHOT aan het versienummer is een Maven-gewoonte om aan te geven dat de versie 'onstabiel'
+    is. Technisch houdt niets je namelijk tegen om dezelfde versie opnieuw te uploaden, maar met stiekeme
+    wijzigingen. Dat zou echter erg verwarrend zijn voor mensen die jouw code gebruiken. Met de toevoeging
+    "-SNAPSHOT" geef je expliciet aan dat je nog wel wat wijzigingen van plan bent door te voeren.
+}.
+
 \begin{listing}[H]
     \begin{minted}[linenos]{xml}
+<project>
+    ...
+    <groupId>nl.hu.bep2</groupId>
+    <artifactId>casino</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>bep2-huland-casino</name>
+    ...
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -209,6 +226,7 @@ enzovoorts enzovoorts. Deze dependencies van je dependencies noemt men ook wel T
             <version>5.10.2</version>
         </dependency>
     </dependencies>
+</project>
     \end{minted}
     \caption{Voorbeeld xml dependency in Maven.}
     \label{maven:example1}
@@ -227,3 +245,43 @@ stiekem gewoon een .zip bestand (die je dus ook als zip kan uitpakken) met al je
 Maven is een oude, uitgebreide tool en heeft dus nog allerhande andere functionaliteiten (zoals het hosten van een documentatie website), 
 en nog vele subtiliteiten (zoals de "dependencymanagement" sectie, die weer totaal anders werkt dan de "dependencies" sectie), en dan
 hebben we het nog niet eens over het concept Lifecycles gehad. Maar voor nu weet je genoeg om met Maven te gaan stoeien.
+
+\subsection*{Maven, Dependencies \& DependencyManagement}
+
+We hebben hierboven uitgebreid zitten praten over hoe Maven-coordinates altijd uit drie delen bestaan (GroupId, ArtifactId, Version),
+en dan vervolgens ziet het eerste voorbeeld van Spring er uit als in \ref{maven:spring}. Daar staat geen 
+version, en toch snapt Maven je? Hoe kan dat?
+
+\begin{listing}[H]
+    \begin{minted}[linenos]{xml}
+<project>
+        ...
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
+</project>
+    \end{minted}
+    \caption{@RestControllers toevoegen aan Spring.}
+    \label{maven:spring}
+\end{listing}
+
+De truuc zit 'm in een ander stuk van deze pom:
+
+\section{Samenvatting}
+
+We hebben het kort gehad over externe code, en dat je dat grofweg kan verdelen tussen libraries en frameworks.
+Bij libraries blijf jij grotendeels 'de baas' over hoe de structuur van de applicatie er uit ziet,
+maar bij frameworks kies je er voor om hun standaard-aanpak te volgen. Die standaard aanpak laat zich
+uitbreiden door middel van zogeheten "hot spots" (of extension points); plekken waar jij jouw code in het
+framework kan "ophangen".
+
+Het framework dat we in dit vak gebruiken is Spring, en we gebruiken Spring Boot om Spring wat makkelijker
+te kunnen configureren en opstarten.
+
+Libraries en frameworks zijn vaak geschreven door derden. Dus je hebt een manier nodig om duidelijk aan 
+te geven welke je gebruikt, en idealiter ook iets dat ze automatisch binnenhaalt. Dat zorgt er voor
+dat jouw code direct uit een Git-repository bruikbaar is, en er niet eerst nog allerlei spul geïnstalleerd
+hoeft te worden. Maven is een stuk gereedschap dat dit probleem oplost.
