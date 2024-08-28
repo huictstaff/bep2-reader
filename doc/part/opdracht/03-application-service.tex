@@ -123,7 +123,7 @@ aansluiting met infrastructuur via interfaces (data).
 Het casino-project kent verder een flexible layered architecture: 
 je mag lagen overslaan.
 Zo mag je in de presentatielaag exceptions uit het domein
-afhandelen zodat een HTTP-response de juiste statuscode kan hebben.
+afhandelen zodat een HTTP-response de juiste statuscode kan hebben (door middel van ResponseStatusExceptions).
 Dit is in veel gelaagde architecturen niet het geval. In die architecturen 
 heeft een laag alleen koppeling met de laag rechtstreeks eronder.
 In ons project is dit niet nodig. Het scheelt een hoop extra code en we 
@@ -138,11 +138,10 @@ tolereren de extra koppeling.
 
 Als je de realisatie toch meer wil afstemmen op de laging, zou je de 
 data-objecten en domein-objecten van elkaar splitsen en deze als losse objecten opnemen in de datalaag.
-Daarvoor moet je dan daartussen een vertaalslag aanbieden. 
-Als je daarnaast wil verbieden dat er lagen worden overgeslagen, 
-zou je ook een vertaalslag kunnen toevoegen tussen domeinobjecten en presentatie-objecten.
+Daarvoor moet je dan daartussen een vertaalslag aanbieden.
 Als alternatief zou je de infrastructuur-abstractie
 (de repositories) kunnen opnemen in het domein en dat \textit{data} package verwijderen.
+Ook zou je kunnen verbieden dat er lagen worden overgeslagen.
 In ons project passen we deze regels echter niet zo strikt toe:
 we accepteren een lichte koppeling op het framework en op ons domein.
 
