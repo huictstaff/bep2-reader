@@ -1,10 +1,10 @@
 
 name: Deploy pdf to release
 
-on:
-  # Runs on pushes targeting the default branch
+on:  
   push:
-    branches: [ "cicd" ]
+    tags: 
+    - "*"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -20,9 +20,7 @@ jobs:
           docker compose run --rm latex-release   
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Development Build"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"          
+          prerelease: false
           files: |            
             ./doc/*.pdf
